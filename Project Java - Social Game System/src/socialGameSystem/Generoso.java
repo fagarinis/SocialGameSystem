@@ -1,12 +1,14 @@
 package socialGameSystem;
 import java.awt.Color;
 
+import interfacciaGraficaSGS.GraphicsSGS;
+
 public class Generoso extends Giocatore {
-	private final static Color COLORE = Color.GREEN;
+	protected final static float COLORE = 85/255f;//Color.GREEN;
 
 	// parametri della strategia
-	private final static float BASE_GIVE = 3; // quando benessere puo' dare alle relazioni ogni messaggio
-	private final static float BASE_TAKE = 0; // quando benessere puo' togliere dalle relazioni ogni messaggio
+	private final static float BASE_GIVE = 6; // quando benessere puo' dare alle relazioni ogni messaggio
+	private final static float BASE_TAKE = 3f; // quando benessere puo' togliere dalle relazioni ogni messaggio
 
 
 	public Generoso() {
@@ -15,9 +17,6 @@ public class Generoso extends Giocatore {
 
 	@Override
 	public float givePower() {
-		if (this.hasRelationshipWithEgoista())
-			return 0;
-		else
 			return BASE_GIVE;
 	}
 
@@ -28,27 +27,29 @@ public class Generoso extends Giocatore {
 	}
 
 	@Override
-	public void talk(int k) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void receiveMessages() {
-		// TODO Auto-generated method stub
-		
-	}
+	//strategia giocatore generoso: aumenta il benessere alle sue relazioni
+	public float talk(int k) {/*
 	
-	public Color colore() {
-		return COLORE;
+	
+		if (this.hasRelationshipWithEgoista()) 
+			return 0;
+		else*/
+		
+		float benesserePreso = this.takePower() * this.takeModifierOfRelationship(k);
+		this.addWealth(benesserePreso);
+		float benessereDato = this.givePower() * this.giveModifierOfRelationship(k);
+		return benessereDato - benesserePreso;
+			//return givePower() * this.giveModifierOfRelationship(k);
 	}
 
-	@Override
-	public void setPosition(int _x, int _y) {
-		this.x = _x;
-		this.y = _y;
-		// TODO Auto-generated method stub
-		
-	}
+
+
+
+
+
+	
+
+
+
 
 }
