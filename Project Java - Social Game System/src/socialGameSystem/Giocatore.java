@@ -9,53 +9,67 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import interfacciaGraficaSGS.GraphicsSGS;
-
+/**
+ * questa classe rappresenta ogni singola istanza di un giocatore sullo scacchiere relazionale e include
+ * i metodi che devono essere implementati dalle sottoclassi (che sono tipologie specifiche di giocatore).
+ * 
+ * @author Federico Agarinis
+ *
+ */
 public abstract class Giocatore {
+	
 	// Parametri statici per tutti i giocatori
 	protected final static float MIN_WEALTH = 0;	 								// benessere Quando il giocatore muore
 	protected final static float MAX_WEALTH = 100; 								// benessere Quando il giocatore si replica
-	private final static float BASE_WEALTH = (MAX_WEALTH-MIN_WEALTH) / 2; 		// Benessere alla creazione del giocatore
+	protected final static float BASE_WEALTH = (MAX_WEALTH-MIN_WEALTH) / 2; 		// Benessere alla creazione del giocatore
 	protected final static int RELATIONSHIP_SIZE = 9; 							// Numero di relazioni massime
 
 	
 	private final static float[] GIVE_MODIFIER = {0, 1, 3, 1, (float) 1.5, (float) 1.5, 0.25f, 0.1f, 0.25f };
 	private final static float[] TAKE_MODIFIER = {0, 0.25f, 0.1f, 0.25f, (float) 1.5, (float) 1.5, 1, 2, 1	};
 	
-	public final static int OVERPOPULATION = 3; 			   	//se si hanno piu relazioni di queste si perde benessere
-	public final static int UNDERPOPULATION = 2; 				//se si hanno meno relazioni di queste si perde benessere
+	
+	final static int OVERPOPULATION = 3; 			   	//se si hanno piu relazioni di queste si perde benessere
+	final static int UNDERPOPULATION = 2; 				//se si hanno meno relazioni di queste si perde benessere
 	private final static int OVERPOPULATION_HEALTH_LOST = 100; 	//benessere perso per sovrappopolazione/depopolazione
 	private static int playerIdCounter = 0;
 
-	public final static boolean RANDOM_REPRODUCE = false; //se true i giocatori si replicheranno a caso sulla mappa
-	public final static int TURNS_OF_IMMUNITY = 0; //turni in cui un giocatore e' immune agli effetti dell under/overpopulation
+	private final static boolean RANDOM_REPRODUCE = false; //se true i giocatori si replicheranno a caso sulla mappa
+	private final static int TURNS_OF_IMMUNITY = 0; //turni in cui un giocatore e' immune agli effetti dell under/overpopulation
 	
 	
 	// Parametri del singolo giocatore
 	private TipoGiocatore strategy; 					// Generoso, Mediatore, Egoista
-	protected float wealth; 							// Valore del benessere compreso tra MIN_WEALTH e MAX_WEALTH
+	private float wealth; 							// Valore del benessere compreso tra MIN_WEALTH e MAX_WEALTH
 	private boolean death = false;						// Il giocatore e' vivo alla creazione
 	private int turnsAlive = 0;
 	
 	//public Giocatore[] relationships = new Giocatore[RELATIONSHIP_SIZE]; // I giocatori con cui si è in relazione
-	protected float[] lastMessages = new float[RELATIONSHIP_SIZE]; 			// Ultimi messaggi ricevuti
+	private float[] lastMessages = new float[RELATIONSHIP_SIZE]; 			// Ultimi messaggi ricevuti
 	
 	// Parametri del singolo giocatore per l'interfaccia grafica (opzionale)
-	protected Color colore;
+	private Color colore;
 	private Direzione direzione;						// Direzione sulla Board: up, right, down, left
-	protected int riga, colonna; 						// Coordinate sulla Board
-	protected JLabel label;
-	protected int playerId;
+	private int riga, colonna; 						// Coordinate sulla Board
+	private JLabel label;
+	private int playerId;
 
-	// Costruttore
+
+	/**
+	 * Costruttore che inizializza un giocatore con direzione casuale, prima
+	 * che esso sia inserito nella RelationalBoard
+	 * 
+	 * @param _strategy Il tipo di strategia usata dal giocatore
+	 */
 	protected Giocatore(TipoGiocatore _strategy) { 		
 		this.strategy = _strategy;
 		this.wealth = BASE_WEALTH;
-		
-		this.direzione = Direzione.values()[new Random().nextInt(Direzione.values().length)]; // direzione random
+		//this.direzione = ; // direzione random
+		//this.setDirection(Direzione.values()[new Random().nextInt(Direzione.values().length)]);
 		this.playerId = playerIdCounter++;
 	}
 
-	//aggiunge 1 ai turni in cui il giocatore e' stato vivo
+
 	public void addTurn() {
 		this.turnsAlive += 1;
 	}
@@ -104,9 +118,14 @@ public abstract class Giocatore {
 		return this.colore;
 	}
 	
+	/**
+	 * Crea un immagine che indica la direzione del giocatore
+	 * Questo metodo non e' completo
+	 * @param _direzione
+	 */
 	public void setDirection(Direzione _direzione) {
 		this.direzione = _direzione;
-		label.createImage(label.getWidth()/2, label.getHeight());
+		//label.createImage(label.getWidth()/2, label.getHeight()).;;
 		
 	}
 	
@@ -120,7 +139,10 @@ public abstract class Giocatore {
 		return !this.death;
 	}
 
-	// Il giocatore muore e viene rimosso dalle relazioni dei suoi conoscenti
+	/**
+	 *  Il giocatore muore e lo sfondo della sua cella viene resettato, diminuendo il contatore
+	 *  dei giocatori vivi di 1
+	 */
 	protected void die() {
 		this.wealth = MIN_WEALTH;
 		if (this.isImmune()){
@@ -137,39 +159,6 @@ public abstract class Giocatore {
 		
 	}
 
-
-	// Opzionale: resetta il benessere dopo la replicazione
-	protected void resetWealth() {
-		this.wealth = BASE_WEALTH;
-	}
-	
-	///errori...
-	public int[] takeNextEmptyCord(int _riga, int _colonna) {
-		riga = _riga;
-		colonna = _colonna;
-		while (true) {
-			if (RelationalBoard.isEmptyCell(riga, colonna)) break;
-			colonna+=1;
-			if(colonna == RelationalBoard.colonne()) {colonna = 0; riga += 1;}
-			if(riga == RelationalBoard.righe() && colonna == RelationalBoard.colonne()) {colonna = 0; riga = 0;}
-		}
-		return new int[]{riga, colonna};
-		
-	}
-	
-	//errori...
-	public int[] genEmptyCoordinate() {
-		int[] coordinate = new int[2];
-		
-		coordinate[0] = new Random().nextInt(RelationalBoard.righe());
-		coordinate[1] = new Random().nextInt(RelationalBoard.colonne());
-		
-		if(!RelationalBoard.isEmptyCell(coordinate[0], coordinate[1])) {
-			coordinate = takeNextEmptyCord(coordinate[0], coordinate[1]);
-		}
-		
-		return coordinate;
-	}
 
 	//replica il giocatore nelle celle intorno che hanno un certo numero di vicini
 	//genera un giocatore di strategia casuale se randomStrategySpawn == true
@@ -188,29 +177,39 @@ public abstract class Giocatore {
 		if (RelationalBoard.isEmptyCell(riga+1, colonna+1) && RelationalBoard.numberOfNeighboursInCell(riga+1, colonna+1) == numeroVicini)RelationalBoard.addNewPlayer(riga+1, colonna+1, strategia, Direzione.values()[new Random().nextInt(Direzione.values().length)]);
 	}
 	
-	// Crea una copia del giocatore, inserendola nella relational board senza relazioni a caso o a una certa distanza dal genitore
-	//returna true se il giocatore si e' replicato almeno una volta
+	
+	protected void resetWealth() {
+		this.wealth = BASE_WEALTH;
+	}
+	
+	
+	/**
+	 *  Crea una copia del giocatore, inserendola nella relational board senza relazioni a caso o a una certa distanza dal genitore
+	 * @param spawnNear indica il tipo di replicazione nel gioco che dipende da @link {@link Giocatore#RANDOM_REPRODUCE}
+	 * @return true se il giocatore si e' replicato almeno una volta
+	 */
 	protected boolean reproduce(boolean spawnNear) {
 		if(RelationalBoard.isFull()) return false;
-		
-		// Il giocatore si riproduce nelle celle vicine
 		if(spawnNear) {
 			int viciniPrima = this.numeroDiRelazioni();
 			this.spawnNear(3, false); //replica il giocatori nelle celle intorno a lui che hanno 3 vicini
 			
 			int viciniDopo = this.numeroDiRelazioni();
-			if (viciniDopo > viciniPrima) return true;	
+			if (viciniDopo > viciniPrima) 
+				return true;	
+			else
+				return false;
 		}
-
-		/*if (RelationalBoard.isEmptyCell(rigaRandom, colonnaRandom) && RelationalBoard.numberOfNeighboursInCell(rigaRandom, colonnaRandom) == 4) //attenzione, potrebbe anche non riprodursi in questo modo!
-		{RelationalBoard.addNewPlayer(rigaRandom, colonnaRandom, this.strategy(), Direzione.values()[new Random().nextInt(Direzione.values().length)]);
-		return true;}*/
 		else {
 		// Il giocatore si riproduce in un punto a caso della Board
 		int rigaRandom = new Random().nextInt(RelationalBoard.righe());
 		int colonnaRandom = new Random().nextInt(RelationalBoard.colonne());
-		if (RelationalBoard.isEmptyCell(rigaRandom, colonnaRandom) && !RelationalBoard.isCrowded(rigaRandom, colonnaRandom)) //attenzione, potrebbe anche non riprodursi in questo modo!
-			{RelationalBoard.addNewPlayer(rigaRandom, colonnaRandom, this.strategy(), Direzione.values()[new Random().nextInt(Direzione.values().length)]);
+		if (RelationalBoard.isEmptyCell(rigaRandom, colonnaRandom) && !RelationalBoard.isCrowded(rigaRandom, colonnaRandom)){
+			RelationalBoard.addNewPlayer(
+					rigaRandom, 
+					colonnaRandom, 
+					this.strategy(), 
+					Direzione.values()[new Random().nextInt(Direzione.values().length)]);
 			return true;
 			}
 		}
@@ -218,27 +217,23 @@ public abstract class Giocatore {
 		return false;
 	};
 
-	// Returna l'ultimo messaggio ricevuto dalla relazione in posizione k
+	
 	public float lastMessageFrom(int k) {
-		if (relationship(k) == null)
-			return 0;
-		else
-			return lastMessages[k];
+		if (relationship(k) == null) return 0;
+		else return lastMessages[k];
 	}
 
-
 	
-	//Returna il modificatore Give del giocatore per la relazione K
 	public float giveModifierOfRelationship(int k) {
 		return GIVE_MODIFIER[k];
 		}
 	
-	//Returna il modificatore Take del giocatore per la relazione K
+
 	public float takeModifierOfRelationship(int k) {
 		return TAKE_MODIFIER[k];
 	}
 	
-	// Returna il benessere del giocatore
+
 	public float benessere() {
 		return this.wealth;
 	}
@@ -255,27 +250,35 @@ public abstract class Giocatore {
 	public abstract float talk(int k);		//invia un messaggio alla relazione k con i modificatori descritti nei MODIFIERS
 
 	
-	// Aggiunge o sottrae benessere, facendolo morire o replicare a una determinata soglia
+	/**
+	 * Aggiunge o sottrae benessere, facendolo morire o replicare il giocatore se il benessere
+	 * raggiunge una una determinata soglia. Il colore del giocatore viene aggiornato.
+	 * 
+	 * @param benessereRicevuto
+	 */
 	public void addWealth(float benessereRicevuto) {
 		this.wealth += benessereRicevuto;
-		if (this.wealth <= MIN_WEALTH) { // il giocatore muore
-			
+		
+		if (this.wealth <= MIN_WEALTH) {
 			this.die();
 			return;
-			
 		}
-		if (this.wealth >= MAX_WEALTH) { // replica il giocatore
-			if (this.reproduce(!RANDOM_REPRODUCE))  //se si replica resetta il benessere
+		
+		if (this.wealth >= MAX_WEALTH) { 			// tenta di replicare il giocatore
+			if (this.reproduce(!RANDOM_REPRODUCE))  // se si replica resetta il benessere
 				this.resetWealth();
 			else
-				this.wealth = MAX_WEALTH; //altrimenti rimane al massimo
+				this.wealth = MAX_WEALTH; 			//altrimenti il benesssere rimane al massimo
 		}
 		
 		this.updateColore();
 
 	}
 	
-	//TEST diminuisce il benessere se si hanno troppe o troppo poche relazioni
+	/**
+	 * Diminuisce il benessere del giocatore di {@value #OVERPOPULATION_HEALTH_LOST} se il numero di relazioni non rispetta i parametri
+	 * non e' compreso tra {@value #UNDERPOPULATION}  e {@value #OVERPOPULATION} inclusi.
+	 */
 	public void wealthFromPopulation() {
 		int r = this.numeroDiRelazioni();
 		if (r > OVERPOPULATION) {
@@ -289,7 +292,9 @@ public abstract class Giocatore {
 		
 	}
 	
-	//ricevi messaggi da tutte le relazioni e aggiorna il benessere totale
+	/**
+	 * Il giocatore riceve messaggi da tutte le sue relazioni e aggiorna il benessere del giocatore
+	 */
 	public void receiveMessages() {
 		float benessereRicevuto = 0;
 		for(int i = 1; i < RELATIONSHIP_SIZE; i++) 
@@ -312,10 +317,15 @@ public abstract class Giocatore {
 	}
 	
 	
-	
-	//returna il giocatore in relazione di tipo i
+	/**
+	 * In base alle coordinate del giocatore e alla sua direzione, trova il giocatore nella relazione
+	 * i, appoggiandosi ad altri metodi privati.
+	 * @param i indice relazione 	<br>123 <br>
+	 * 					  				405<br>
+	 * 					  				678
+	 * @return oggetto Giocatore in posizione di relazione i
+	 */
 	public Giocatore relationship(int i) {
-		if(!(0<=i && i < 9))System.out.println(i);
 		if (i == 0) return RelationalBoard.getPlayer(this.riga, this.colonna);
 		if (this.direction() == Direzione.up) return this.relationshipGiocatoreUp(i);
 		if (this.direction() == Direzione.down) return this.relationshipGiocatoreDown(i);
@@ -382,58 +392,22 @@ public abstract class Giocatore {
 		
 	
 	
-	/*
-	public int typeOfRelationshipWith(Giocatore player) {
-		for (int i = 0; i < RELATIONSHIP_SIZE; i++) {
-			if (relationships[i] != null)  relationships[i].updateRelationship();
-			if (relationships[i] == player) 
-				return i;
-		}
-		return -1; //returna -1 se non sono in relazione
-	}
-	*/
-	//date due coordinate returna l'indice della relazione con il giocatore di coordinate (_riga, _colonna) dalla vista del giocatore
-	public int indiceRelazione(int _riga, int _colonna) {
-		int diff_riga = _riga - this.riga;
-		int diff_colonna = _colonna - this.colonna;
-		//System.out.println(diff_riga + " "+ diff_colonna + "giocatore: "+this+" (" +riga+","+colonna+") confronto con  ("+_riga+","+_colonna+") " );
-		if (diff_riga == 0 && diff_colonna == 0) return 0;
-		if (this.direction() == Direzione.up) {
-			if (diff_riga == -1 && diff_colonna == -1)	return 1; if (diff_riga == -1 && diff_colonna == 0) return 2; 	if (diff_riga == -1 && diff_colonna == +1) return 3;
-			if (diff_riga == 0 	&& diff_colonna == -1) 	return 4;														if (diff_riga == 0 	&& diff_colonna == +1) return 5;
-			if (diff_riga == 1 	&& diff_colonna == -1) 	return 6; if (diff_riga == 1  && diff_colonna == 0)	return 7; 	if (diff_riga == 1 	&& diff_colonna == 1)  return 8;
-		}
-		if (this.direction() == Direzione.down) {
-			if (diff_riga == -1 && diff_colonna == -1)	return 8; if (diff_riga == -1 && diff_colonna == 0) return 7; 	if (diff_riga == -1 && diff_colonna == +1) return 6;
-			if (diff_riga == 0 	&& diff_colonna == -1) 	return 5;														if (diff_riga == 0 	&& diff_colonna == +1) return 4;
-			if (diff_riga == 1 	&& diff_colonna == -1) 	return 3; if (diff_riga == 1  && diff_colonna == 0)	return 2; 	if (diff_riga == 1 	&& diff_colonna == 1)  return 1;
-		
-		}
-		if (this.direction() == Direzione.left) {
-			if (diff_riga == -1 && diff_colonna == -1)	return 3; if (diff_riga == -1 && diff_colonna == 0) return 5; 	if (diff_riga == -1 && diff_colonna == +1) return 8;
-			if (diff_riga == 0 	&& diff_colonna == -1) 	return 2;														if (diff_riga == 0 	&& diff_colonna == +1) return 7;
-			if (diff_riga == 1 	&& diff_colonna == -1) 	return 1; if (diff_riga == 1  && diff_colonna == 0)	return 4; 	if (diff_riga == 1 	&& diff_colonna == 1)  return 6;
-		}
-		if (this.direction() == Direzione.right) {
-			if (diff_riga == -1 && diff_colonna == -1)	return 6; if (diff_riga == -1 && diff_colonna == 0) return 4; 	if (diff_riga == -1 && diff_colonna == +1) return 1;
-			if (diff_riga == 0 	&& diff_colonna == -1) 	return 7;														if (diff_riga == 0 	&& diff_colonna == +1) return 2;
-			if (diff_riga == 1 	&& diff_colonna == -1) 	return 8; if (diff_riga == 1  && diff_colonna == 0)	return 5; 	if (diff_riga == 1 	&& diff_colonna == 1)  return 3;
-		}
-		
-		
-		
-		return -1;
-	}
-	
-	//returna come l'indice k vede il giocatore
+	/**
+	 * @param k indice della relazione la quale si vuole sapere come questa vede il giocatore
+	 * @return l'indice della relazione del giocatore rispetto alla relazione k
+	 */
 	protected int howIsSeenByRelationship(int k) {
-		for(int i = 1; i < RELATIONSHIP_SIZE+1; i++) {
+		for(int i = 1; i < RELATIONSHIP_SIZE; i++) {
 			if(relationship(k).relationship(i) == this) return i;
 		}
 		return -1; //errore
 	}
 	
-	// Ricevi un singolo messaggio da una relazione specifica
+	/**
+	 *  Ricevi un singolo messaggio da una relazione specifica
+	 * @param i indice della relazione
+	 * @return valore di benessere ricevuto dalla comunicazione con la relazione i
+	 */
 	public float receiveMessageFromRelationship(int i) {
 		Giocatore amico = relationship(i);
 		if (amico == null) 
@@ -442,7 +416,10 @@ public abstract class Giocatore {
 			return amico.talk(this.howIsSeenByRelationship(i));
 	}
 	
-	//aggiorna il colore dopo qualsiasi aggiornamento del benessere
+	/**
+	 * aggiorna la luminosita' del colore del giocatore 
+	 * dopo qualsiasi aggiornamento del benessere
+	 */
 	protected void updateColore() {
 		float brightness = (float) 0.5*(1+this.wealthPercent()); //la luminosita del colore aumenta con 
 		float hueGiocatore = 0;									//il benessere del giocatore
@@ -452,10 +429,19 @@ public abstract class Giocatore {
 		
 		this.colore = Color.getHSBColor(hueGiocatore, 0.5f, brightness); 
 		this.label.setBackground(this.getColore());	
+		this.updateDirectionImage();
+		
+	}
+	
+	/**
+	 * da Finire
+	 */
+	public void updateDirectionImage() {
+		label.getGraphics().drawRect(0, 5, label.getWidth()/2, label.getHeight());
+		
 	}
 	
 	
-	// Controlla se si è in relazione con almeno un egoista (escluso se' stesso)
 	public boolean hasRelationshipWithEgoista() {
 		for (int i = 1; i < RELATIONSHIP_SIZE; i++) {
 			if (this.relationship(i) != null && this.relationship(i).strategy() == TipoGiocatore.egoista) {
@@ -465,7 +451,7 @@ public abstract class Giocatore {
 		return false;
 	}
 	
-	// Controlla se si è in relazione con almeno un generoso (escluso se' stesso)
+	
 		public boolean hasRelationshipWithGeneroso() {
 			for (int i = 1; i < RELATIONSHIP_SIZE; i++) {
 				if (this.relationship(i) != null && this.relationship(i).strategy() == TipoGiocatore.generoso) {

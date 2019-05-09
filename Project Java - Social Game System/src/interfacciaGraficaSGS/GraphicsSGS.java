@@ -338,7 +338,10 @@ public class GraphicsSGS{
 	    return label;
 	}
 	
-	
+	/**
+	 * resetta lo sfondo del quadrato
+	 * @param label
+	 */
 	public static void resetLabelBackground(JLabel label) {
 		label.setBackground(defaultCellBackground);
 	}

@@ -98,9 +98,6 @@ public class RelationalBoard{
 		Giocatore player = creaGiocatore(tipoPlayer, direzione, riga, colonna);
 		cella[riga][colonna] = player;
 		addAlivePlayerTextField(1, player);
-		
-		//player.updateRelationship();
-		
 	}
 	
 	public static void addTurnTextField(int n) {
@@ -112,7 +109,7 @@ public class RelationalBoard{
 		AlivePlayers += n;
 		GraphicsSGS.textField_alivePlayers.setText(String.valueOf(AlivePlayers));
 	}
-	
+
 	public static void resetTurnTextField() {
 		RelationalBoard.Turn = 0;
 	    GraphicsSGS.textField_turn.setText(String.valueOf(RelationalBoard.getTurn()));
@@ -159,10 +156,11 @@ public class RelationalBoard{
 		JLabel labelOfPlayer = GraphicsSGS.celle[riga* GraphicsSGS.colonne + colonna];
 		
 		nuovoGiocatore.setLabel(labelOfPlayer);
-		nuovoGiocatore.updateColore();
+		
 		nuovoGiocatore.setDirection(direzione);
 		nuovoGiocatore.setPosition(riga, colonna);
-
+		nuovoGiocatore.updateColore();
+		
 		//nuovoGiocatore.updateRelationship();
 		//nuovoGiocatore.updateRelationshipWithPlayerForAllRelationships();
 		
@@ -233,13 +231,8 @@ public class RelationalBoard{
 	public static void deleteCella(int riga, int colonna) {
 		cella[riga][colonna] = null;
 	}
+	
 
-	public static Giocatore getPlayerFromLabel(JLabel label) {
-		for (Giocatore[] riga: cella ) 
-			for(Giocatore player: riga) 
-				if (player.label == label) return player;
-		return null;
-	}
 	
 	public static void step() {
 		for (Giocatore[] riga: cella)
