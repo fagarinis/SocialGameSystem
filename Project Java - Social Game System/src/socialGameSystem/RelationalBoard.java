@@ -245,6 +245,7 @@ public class RelationalBoard{
 		for (Giocatore[] riga: cella)
 			for (Giocatore player: riga) {
 				if (player != null) {
+					player.addTurn(); //aggiunge 1 al turno in cui il giocatore e' stato vivo
 					player.receiveMessages(); //il benessere si aggiorna dai messaggi che arrivano
 					player.wealthFromPopulation(); //il benessere si aggiorna per sovrapopolazione o solitudine
 				}

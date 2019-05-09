@@ -67,6 +67,7 @@ public class GraphicsSGS{
 	public static JButton StartStopButton;
 	private static JTextField speedTextField;
 	private static JSlider speedSlider;
+	private JTextField textField;
 	
 	public static int getSpeed() {
 		return speedSlider.getMaximum()+1 -speedSlider.getValue();
@@ -245,6 +246,17 @@ public class GraphicsSGS{
 		matrix.setPreferredSize(new Dimension(latoCella-85, latoCella-85));
 		
 		contenitoreMatrice.add(matrix);
+		
+		JPanel panel = new JPanel();
+		frmSocialGameSystem.getContentPane().add(panel, BorderLayout.EAST);
+		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		
+		JLabel lblNewLabel_1 = new JLabel("New label");
+		panel.add(lblNewLabel_1);
+		
+		textField = new JTextField();
+		panel.add(textField);
+		textField.setColumns(10);
 				
 		
 				
