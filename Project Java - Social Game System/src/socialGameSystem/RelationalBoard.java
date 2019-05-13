@@ -235,6 +235,7 @@ public class RelationalBoard{
 
 	
 	public static void step() {
+		
 		for (Giocatore[] riga: cella)
 			for (Giocatore player: riga) {
 				if (player != null) {
@@ -243,6 +244,7 @@ public class RelationalBoard{
 					player.wealthFromPopulation(); //il benessere si aggiorna per sovrapopolazione o solitudine
 				}
 			}
+		
 		addTurnTextField(1);
 		
 	}

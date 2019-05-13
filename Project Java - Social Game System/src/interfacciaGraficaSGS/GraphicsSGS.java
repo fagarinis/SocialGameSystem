@@ -306,7 +306,6 @@ public class GraphicsSGS{
 				
 					int pos = labelPosition(label);
 					Giocatore player = RelationalBoard.getPlayer(pos/colonne, pos%colonne);
-					//System.out.println(player);
 					if(player != null) {
 						System.out.println(player.wealthPercent() + " "+player.direction()+ "("+player.getRiga()+","+player.getColonna()+")");
 					}

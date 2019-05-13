@@ -437,7 +437,7 @@ public abstract class Giocatore {
 	 * da Finire
 	 */
 	public void updateDirectionImage() {
-		label.getGraphics().drawRect(0, 5, label.getWidth()/2, label.getHeight());
+		//label.getGraphics().drawRect(0, 5, label.getWidth()/2, label.getHeight());
 		
 	}
 	
