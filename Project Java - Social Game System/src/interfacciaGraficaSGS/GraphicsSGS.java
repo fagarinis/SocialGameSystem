@@ -30,14 +30,20 @@ import java.awt.event.AdjustmentListener;
 import java.awt.event.AdjustmentEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
+import java.awt.event.WindowStateListener;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 
 public class GraphicsSGS{
 
-	public JFrame frmSocialGameSystem;
+	public static JFrame frmSocialGameSystem;
 	public static JTextField textField_turn;
 	public static JTextField textField_alivePlayers;
 
-	public final static int righe = 45; //RIGHE DELLA MATRICE QUADRATA
+	public final static int righe = 55; //RIGHE DELLA MATRICE QUADRATA
 	public final static int colonne = righe;
 	public final static int numeroCelle = righe * colonne;
 	private int latoCella;
@@ -48,7 +54,7 @@ public class GraphicsSGS{
 	
 	public static JLabel[] celle = new JLabel[numeroCelle];
 	protected JPanel matrix = new JPanel();
-	protected Component contenitoreMatrice;
+	protected static Component contenitoreMatrice;
 	
 	private static boolean wasRunning = false;
 	JComboBox comboBox;
@@ -61,8 +67,8 @@ public class GraphicsSGS{
 	private final static Color defaultCellBackground = Color.GRAY;
 	
 	
-	private static final int changedWealthOnClick = 3;
-	private JCheckBox chckbxAddremoveWealthOn;
+	static final int changedWealthOnClick = 3;
+	static JCheckBox chckbxAddremoveWealthOn;
 	public static JButton stepButton;
 	public static JButton StartStopButton;
 	private static JTextField speedTextField;
@@ -85,6 +91,13 @@ public class GraphicsSGS{
 	 */
 	public void initialize() {
 		frmSocialGameSystem = new JFrame();
+		frmSocialGameSystem.setMinimumSize(new Dimension(1400, 485));
+	
+		
+		
+		
+		
+		frmSocialGameSystem.setIconImage(Toolkit.getDefaultToolkit().getImage(GraphicsSGS.class.getResource("/com/sun/java/swing/plaf/motif/icons/DesktopIcon.gif")));
 		frmSocialGameSystem.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		frmSocialGameSystem.setTitle("Social Game System");
 		frmSocialGameSystem.setBounds(50, 50, 1600, 850);
@@ -192,7 +205,7 @@ public class GraphicsSGS{
 		panel_1.add(speedSlider);
 		
 		JPanel panel_2 = new JPanel();
-		menu.add(panel_2, BorderLayout.EAST);
+		menu.add(panel_2, BorderLayout.CENTER);
 		
 		JButton btnGenrandomplayers = new JButton("GenRandomPlayers");
 		btnGenrandomplayers.addActionListener(new ActionListener() {
@@ -221,43 +234,53 @@ public class GraphicsSGS{
 		
 		
 		JPanel contenitoreMatrice = new JPanel();
-		contenitoreMatrice.addComponentListener(new ComponentAdapter() {
-			@Override
-			public void componentResized(ComponentEvent e) {
-
-			}
-		});
+	
 		contenitoreMatrice.setBackground(Color.DARK_GRAY);
 		frmSocialGameSystem.getContentPane().add(contenitoreMatrice, BorderLayout.CENTER);
 		
 		contenitoreMatrice.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 	
 		//crea la griglia
-		
-				
 		JPanel matrix = new JPanel();
-	
-		
-		
 		matrix.setLayout(new GridLayout(righe, colonne));
-	
-		
 		latoCella = frmSocialGameSystem.getHeight();
 		matrix.setPreferredSize(new Dimension(latoCella-85, latoCella-85));
 		
 		contenitoreMatrice.add(matrix);
 		
+	
+		
+		frmSocialGameSystem.addComponentListener(new ComponentAdapter() {
+			@Override
+			//il contenitore della matrice deve cambiare dimensione on-resize
+			public void componentResized(ComponentEvent e) { 
+				new Thread(new Runnable() {
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						latoCella = Math.min(contenitoreMatrice.getHeight(), frmSocialGameSystem.getWidth());
+						matrix.setPreferredSize(new Dimension(latoCella-5, latoCella-5));
+						CellaMatrice.updateAllFontSize();
+					}
+					
+				}).start();
+				
+				//contenitoreMatrice.setSize(1500,1500);
+				//matrix.setSize(1200,1200);
+			}
+		});
+		
+		/*pannello destro delle INFO
 		JPanel panel = new JPanel();
 		frmSocialGameSystem.getContentPane().add(panel, BorderLayout.EAST);
 		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-		
 		JLabel lblNewLabel_1 = new JLabel("New label");
 		panel.add(lblNewLabel_1);
-		
 		textField = new JTextField();
 		panel.add(textField);
 		textField.setColumns(10);
-				
+		*/
 		
 				
 		//Color[] colors = new Color[] { Color.GREEN, Color.RED, Color.BLUE };
@@ -265,9 +288,9 @@ public class GraphicsSGS{
 				
 		//inserisci tutte le celle
 			for (int i = 0; i < celle.length; i++) {
-				 JLabel label = creaLabelCella();
-				 matrix.add(label);
-				 celle[i] = label;
+				 CellaMatrice cella = new CellaMatrice();
+				 matrix.add(cella.getLabel());
+				 celle[i] = cella.getLabel();
 				}
 		
 		
@@ -279,7 +302,11 @@ public class GraphicsSGS{
 	}
 	
 	
-
+	/**
+ 	* @deprecated sostituito con CellaMatrice.Java
+ 	* @return
+ 	*/
+	/*
 	public JLabel creaLabelCella(){
 		JLabel label = new JLabel();
 		
@@ -337,6 +364,16 @@ public class GraphicsSGS{
 	    return label;
 	}
 	
+	*/
+	
+	
+	/**
+	 * @return La grandezza grafica della singola cella sullo schermo
+	 */
+	public static int getCellaWidth(){
+		return Math.min(contenitoreMatrice.getHeight(), frmSocialGameSystem.getWidth()) / GraphicsSGS.righe;
+		
+	}
 	/**
 	 * resetta lo sfondo del quadrato
 	 * @param label
@@ -344,6 +381,7 @@ public class GraphicsSGS{
 	public static void resetLabelBackground(JLabel label) {
 		label.setBackground(defaultCellBackground);
 	}
+	
 
 	
 	//returna il JLabel associato alla cella di coordinate x e y
@@ -362,6 +400,9 @@ public class GraphicsSGS{
 		return -1;
 	}
 	
+	
+
+	/*
 	public static int labelX(JLabel cella){
 		return labelPosition(cella)/(colonne);
 	}
@@ -369,5 +410,5 @@ public class GraphicsSGS{
 	public static int labelY(JLabel cella){
 		return labelPosition(cella)%(colonne);
 	}
-	
+	*/
 }

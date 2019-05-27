@@ -8,6 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import interfacciaGraficaSGS.CellaMatrice;
 import interfacciaGraficaSGS.GraphicsSGS;
 /**
  * questa classe rappresenta ogni singola istanza di un giocatore sullo scacchiere relazionale e include
@@ -19,8 +20,8 @@ import interfacciaGraficaSGS.GraphicsSGS;
 public abstract class Giocatore {
 	
 	// Parametri statici per tutti i giocatori
-	protected final static float MIN_WEALTH = 0;	 								// benessere Quando il giocatore muore
-	protected final static float MAX_WEALTH = 100; 								// benessere Quando il giocatore si replica
+	public final static float MIN_WEALTH = 0;	 								// benessere Quando il giocatore muore
+	public final static float MAX_WEALTH = 100; 								// benessere Quando il giocatore si replica
 	protected final static float BASE_WEALTH = (MAX_WEALTH-MIN_WEALTH) / 2; 		// Benessere alla creazione del giocatore
 	protected final static int RELATIONSHIP_SIZE = 9; 							// Numero di relazioni massime
 
@@ -32,7 +33,7 @@ public abstract class Giocatore {
 	final static int OVERPOPULATION = 3; 			   	//se si hanno piu relazioni di queste si perde benessere
 	final static int UNDERPOPULATION = 2; 				//se si hanno meno relazioni di queste si perde benessere
 	private final static int OVERPOPULATION_HEALTH_LOST = 100; 	//benessere perso per sovrappopolazione/depopolazione
-	private static int playerIdCounter = 0;
+	private static long playerIdCounter = 0;
 
 	private final static boolean RANDOM_REPRODUCE = false; //se true i giocatori si replicheranno a caso sulla mappa
 	private final static int TURNS_OF_IMMUNITY = 0; //turni in cui un giocatore e' immune agli effetti dell under/overpopulation
@@ -51,8 +52,8 @@ public abstract class Giocatore {
 	private Color colore;
 	private Direzione direzione;						// Direzione sulla Board: up, right, down, left
 	private int riga, colonna; 						// Coordinate sulla Board
-	private JLabel label;
-	private int playerId;
+	private CellaMatrice cella;
+	private long playerId;
 
 
 	/**
@@ -78,7 +79,7 @@ public abstract class Giocatore {
 		return this.turnsAlive < TURNS_OF_IMMUNITY;
 	}
 	
-	public int getId() {
+	public long getId() {
 		return this.playerId;
 	}
 	
@@ -86,12 +87,12 @@ public abstract class Giocatore {
 		return this.direzione;
 	}
 	
-	public void setLabel(JLabel _label) {
-		this.label = _label;
+	public void setCella(CellaMatrice _cella) {
+		this.cella = _cella;
 	}
 	
 	public JLabel getLabel() {
-		return this.label;
+		return this.cella.getLabel();
 	}
 	
 
@@ -125,7 +126,6 @@ public abstract class Giocatore {
 	 */
 	public void setDirection(Direzione _direzione) {
 		this.direzione = _direzione;
-		//label.createImage(label.getWidth()/2, label.getHeight()).;;
 		
 	}
 	
@@ -139,6 +139,9 @@ public abstract class Giocatore {
 		return !this.death;
 	}
 
+	public CellaMatrice getCella() {
+		return this.cella;
+	}
 	/**
 	 *  Il giocatore muore e lo sfondo della sua cella viene resettato, diminuendo il contatore
 	 *  dei giocatori vivi di 1
@@ -149,9 +152,13 @@ public abstract class Giocatore {
 			return;
 		}
 		
-		GraphicsSGS.resetLabelBackground(this.getLabel());
 		this.death = true;
+		
 		RelationalBoard.deleteCella(this.riga, this.colonna);
+		
+		this.cella.resetLabelBackground();
+		this.cella.setPlayer(null);
+		this.cella.setDirectionImage(null);
 		
 		RelationalBoard.AlivePlayers -= 1;
 		GraphicsSGS.textField_alivePlayers.setText(String.valueOf(RelationalBoard.AlivePlayers));
@@ -159,9 +166,13 @@ public abstract class Giocatore {
 		
 	}
 
+	/**
+	 * Replica il giocatore nelle celle bersaglio intorno a se' che hanno un determinato numero di vicini
+	 * 
+	 * @param numeroVicini Quanti vicini devono avere le celle bersaglio
+	 * @param randomStrategySpawn Genera un giocatore di strategia casuale se true
+	 */
 
-	//replica il giocatore nelle celle intorno che hanno un certo numero di vicini
-	//genera un giocatore di strategia casuale se randomStrategySpawn == true
 	public void spawnNear(int numeroVicini, boolean randomStrategySpawn) {
 		TipoGiocatore strategia;
 		if (randomStrategySpawn) strategia = TipoGiocatore.values()[new Random().nextInt(TipoGiocatore.values().length)];
@@ -180,11 +191,13 @@ public abstract class Giocatore {
 	
 	protected void resetWealth() {
 		this.wealth = BASE_WEALTH;
+		
 	}
 	
 	
 	/**
 	 *  Crea una copia del giocatore, inserendola nella relational board senza relazioni a caso o a una certa distanza dal genitore
+	 *  
 	 * @param spawnNear indica il tipo di replicazione nel gioco che dipende da @link {@link Giocatore#RANDOM_REPRODUCE}
 	 * @return true se il giocatore si e' replicato almeno una volta
 	 */
@@ -244,6 +257,7 @@ public abstract class Giocatore {
 		this.colonna = _colonna;
 	}
 	
+	
 	//Metodi da implementare nelle sottoclassi che variano a seconda del tipo di giocatore:
 	public abstract float givePower(); 		// quanto benessere può potenzialmente dare alle sue relazioni
 	public abstract float takePower(); 		// quanto benessere può potenzialmente togliere alle sue relazioni
@@ -272,6 +286,7 @@ public abstract class Giocatore {
 		}
 		
 		this.updateColore();
+		
 
 	}
 	
@@ -307,6 +322,9 @@ public abstract class Giocatore {
 		this.addWealth(benessereRicevuto);
 	}
 
+	/**
+	 * @return Un array di oggetti Giocatore contenente all'indice i la relazione numero i
+	 */
 	public Giocatore[] allRelationships() {
 		Giocatore[] relazioni = new Giocatore[RELATIONSHIP_SIZE];
 		for (int i = 0; i < RELATIONSHIP_SIZE; i++) {
@@ -421,6 +439,8 @@ public abstract class Giocatore {
 	 * dopo qualsiasi aggiornamento del benessere
 	 */
 	protected void updateColore() {
+		
+		
 		float brightness = (float) 0.5*(1+this.wealthPercent()); //la luminosita del colore aumenta con 
 		float hueGiocatore = 0;									//il benessere del giocatore
 		if (this.strategy() == TipoGiocatore.generoso) hueGiocatore = Generoso.COLORE;
@@ -428,18 +448,15 @@ public abstract class Giocatore {
 		if (this.strategy() == TipoGiocatore.egoista) hueGiocatore = Egoista.COLORE;
 		
 		this.colore = Color.getHSBColor(hueGiocatore, 0.5f, brightness); 
-		this.label.setBackground(this.getColore());	
-		this.updateDirectionImage();
+		this.getLabel().setBackground(this.getColore());	
 		
+		//non funziona...
+		this.getCella().setDirectionImage(direzione);
+		
+	
 	}
 	
-	/**
-	 * da Finire
-	 */
-	public void updateDirectionImage() {
-		//label.getGraphics().drawRect(0, 5, label.getWidth()/2, label.getHeight());
-		
-	}
+
 	
 	
 	public boolean hasRelationshipWithEgoista() {

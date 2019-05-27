@@ -8,8 +8,9 @@ import interfacciaGraficaSGS.GraphicsSGS;
  * 
  * Sara' possibile notare come, partendo da una generazione casuale, si andranno a formare dei cluster
  * di giocatori di diverso tipo che si aggregano andando a formare dei pattern. Il colore del giocatore
- * denota la sua strategia, e la luminosita' del suo colore denota il suo benessere. 
- * Quando un giocatore raggiunge il massimo del benessere tentera' di riprodursi oppure morira' se il suo benessere si esaurisce.
+ * denota la sua strategia, e la luminosita' del colore denota il suo benessere. 
+ * Quando un giocatore raggiunge il massimo del benessere tentera' di riprodursi 
+ * oppure morira' se il suo benessere si esaurisce oppure se il numero di vicini non e' compreso tra 2 e 3 inclusi
  * 
  * @author Federico Agarinis
  * @version 1.2

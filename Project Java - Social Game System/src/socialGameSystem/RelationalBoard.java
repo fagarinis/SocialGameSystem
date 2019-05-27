@@ -2,6 +2,7 @@ package socialGameSystem;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import interfacciaGraficaSGS.CellaMatrice;
 import interfacciaGraficaSGS.GraphicsSGS;
 
 import java.awt.BorderLayout;
@@ -19,7 +20,7 @@ public class RelationalBoard{
 	static boolean isRunning = false;
 	
 	static int Turn = 0;
-	private static Giocatore[][] cella; //oggetti giocatori
+	private static Giocatore[][] cella; //matrice di oggetti giocatori
 	private static int righe;
 	private static int colonne;
 	
@@ -49,7 +50,9 @@ public class RelationalBoard{
 		return colonne;
 	}
 	
-	//returna il label grafico della cella in posizione [riga][colonna]
+	/**
+	 * @return il label grafico della cella in posizione [riga][colonna]
+	 */
 	public JLabel getLabel(int riga, int colonna) {
 		return GraphicsSGS.celle[riga*GraphicsSGS.colonne + colonna];
 	}
@@ -83,6 +86,7 @@ public class RelationalBoard{
 		return numberOfNeighboursInCell(riga, colonna) > Giocatore.OVERPOPULATION;
 	}
 	
+	
 	public static boolean isEmptyCell(int riga, int colonna) {
 		try {
 			return cella[riga][colonna] == null;
@@ -93,11 +97,15 @@ public class RelationalBoard{
 		
 	}
 	
-	//inserisce un nuovo giocatore nell'oggetto board, settando il colore sullo schermo allo stesso tempo
+	/**
+	 * Inserisce un nuovo giocatore nella board, settandone il colore.
+	 */
 	public static void addNewPlayer(int riga, int colonna, TipoGiocatore tipoPlayer, Direzione direzione) {
 		Giocatore player = creaGiocatore(tipoPlayer, direzione, riga, colonna);
 		cella[riga][colonna] = player;
 		addAlivePlayerTextField(1, player);
+		
+		
 	}
 	
 	public static void addTurnTextField(int n) {
@@ -153,16 +161,18 @@ public class RelationalBoard{
 		if (strategy == TipoGiocatore.mediatore) nuovoGiocatore = new Mediatore();
 		if (strategy == TipoGiocatore.egoista) nuovoGiocatore = new Egoista();
 		
-		JLabel labelOfPlayer = GraphicsSGS.celle[riga* GraphicsSGS.colonne + colonna];
+		CellaMatrice labelOfPlayer = CellaMatrice.getCella(riga, colonna);
 		
-		nuovoGiocatore.setLabel(labelOfPlayer);
+		nuovoGiocatore.setCella(labelOfPlayer);
 		
-		nuovoGiocatore.setDirection(direzione);
+		nuovoGiocatore.setDirection(direzione); //deve essere prima di .setPlayer
+		labelOfPlayer.setPlayer(nuovoGiocatore);
+		
+		
+		
+		
 		nuovoGiocatore.setPosition(riga, colonna);
 		nuovoGiocatore.updateColore();
-		
-		//nuovoGiocatore.updateRelationship();
-		//nuovoGiocatore.updateRelationshipWithPlayerForAllRelationships();
 		
 		return nuovoGiocatore;
 	}
@@ -208,8 +218,8 @@ public class RelationalBoard{
 		GraphicsSGS.StartStopButton.setText("Stop");
 		GraphicsSGS.timer = new Timer();
 		GraphicsSGS.stepButton.setEnabled(false);
-		GraphicsSGS.comboBox_tipoGiocatore.setEnabled(false);
-		GraphicsSGS.comboBox_direzioni.setEnabled(false);
+		//GraphicsSGS.comboBox_tipoGiocatore.setEnabled(false);
+		//GraphicsSGS.comboBox_direzioni.setEnabled(false);
 		
 		GraphicsSGS.timer.schedule( new TimerTask() {
 		    public void run() {
@@ -228,7 +238,11 @@ public class RelationalBoard{
 		GraphicsSGS.StartStopButton.setText("Start");
 	}
 	
+	/**
+	 * Resetta l'aspetto grafico e logico della cella
+	 */
 	public static void deleteCella(int riga, int colonna) {
+
 		cella[riga][colonna] = null;
 	}
 	
@@ -242,6 +256,7 @@ public class RelationalBoard{
 					player.addTurn(); //aggiunge 1 al turno in cui il giocatore e' stato vivo
 					player.receiveMessages(); //il benessere si aggiorna dai messaggi che arrivano
 					player.wealthFromPopulation(); //il benessere si aggiorna per sovrapopolazione o solitudine
+					
 				}
 			}
 		
