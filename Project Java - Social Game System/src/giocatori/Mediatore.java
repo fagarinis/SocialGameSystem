@@ -1,6 +1,9 @@
-package socialGameSystem;
+package giocatori;
 
 import java.awt.Color;
+
+import socialGameSystem.Direzione;
+import socialGameSystem.Giocatore;
 
 public class Mediatore extends Giocatore {
 
@@ -12,6 +15,10 @@ public class Mediatore extends Giocatore {
 	
 	public Mediatore() {
 		super(TipoGiocatore.mediatore);
+	}
+	
+	public Mediatore(Direzione direzione, int riga, int colonna) {
+		super(TipoGiocatore.mediatore, direzione, riga, colonna);
 	}
 	
 	@Override
@@ -55,7 +62,9 @@ public class Mediatore extends Giocatore {
 		return benessereDato - benesserePreso;
 	}
 
-
+	public float colorHue() {
+		return COLORE;
+	}
 
 
 

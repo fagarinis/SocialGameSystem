@@ -1,4 +1,4 @@
-package socialGameSystem;
+package giocatori;
 public  enum TipoGiocatore {
 	//	<Tipo>		 <Colore>
 		generoso,  	// Verde 

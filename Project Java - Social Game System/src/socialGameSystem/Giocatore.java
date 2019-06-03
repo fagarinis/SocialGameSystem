@@ -8,6 +8,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import giocatori.Generoso;
+import giocatori.TipoGiocatore;
 import interfacciaGraficaSGS.CellaMatrice;
 import interfacciaGraficaSGS.GraphicsSGS;
 /**
@@ -32,7 +34,7 @@ public abstract class Giocatore {
 	
 	final static int OVERPOPULATION = 3; 			   	//se si hanno piu relazioni di queste si perde benessere
 	final static int UNDERPOPULATION = 2; 				//se si hanno meno relazioni di queste si perde benessere
-	private final static int OVERPOPULATION_HEALTH_LOST = 100; 	//benessere perso per sovrappopolazione/depopolazione
+	private final static int OVERPOPULATION_HEALTH_LOST = 90; 	//benessere perso per sovrappopolazione/depopolazione
 	private static long playerIdCounter = 0;
 
 	private final static boolean RANDOM_REPRODUCE = false; //se true i giocatori si replicheranno a caso sulla mappa
@@ -44,6 +46,7 @@ public abstract class Giocatore {
 	private float wealth; 							// Valore del benessere compreso tra MIN_WEALTH e MAX_WEALTH
 	private boolean death = false;						// Il giocatore e' vivo alla creazione
 	private int turnsAlive = 0;
+	private int numberOfReproduce = 5;				//quante volte il giocatore si può replicare
 	
 	//public Giocatore[] relationships = new Giocatore[RELATIONSHIP_SIZE]; // I giocatori con cui si è in relazione
 	private float[] lastMessages = new float[RELATIONSHIP_SIZE]; 			// Ultimi messaggi ricevuti
@@ -70,6 +73,20 @@ public abstract class Giocatore {
 		this.playerId = playerIdCounter++;
 	}
 
+	protected Giocatore (TipoGiocatore _strategy, Direzione direzione, int riga, int colonna) {
+		this(_strategy);
+		
+		CellaMatrice labelOfPlayer = CellaMatrice.getCella(riga, colonna);
+		this.setCella(labelOfPlayer);
+		
+		this.setDirection(direzione); //deve essere prima di .setPlayer
+		labelOfPlayer.setPlayer(this);
+		
+		this.setPosition(riga, colonna);
+		this.updateColore();
+
+	}
+	
 
 	public void addTurn() {
 		this.turnsAlive += 1;
@@ -151,17 +168,12 @@ public abstract class Giocatore {
 		if (this.isImmune()){
 			return;
 		}
-		
 		this.death = true;
 		
 		RelationalBoard.deleteCella(this.riga, this.colonna);
 		
-		this.cella.resetLabelBackground();
-		this.cella.setPlayer(null);
-		this.cella.setDirectionImage(null);
 		
-		RelationalBoard.AlivePlayers -= 1;
-		GraphicsSGS.textField_alivePlayers.setText(String.valueOf(RelationalBoard.AlivePlayers));
+	
 		
 		
 	}
@@ -175,6 +187,7 @@ public abstract class Giocatore {
 
 	public void spawnNear(int numeroVicini, boolean randomStrategySpawn) {
 		TipoGiocatore strategia;
+		
 		if (randomStrategySpawn) strategia = TipoGiocatore.values()[new Random().nextInt(TipoGiocatore.values().length)];
 		else strategia = this.strategy();
 		//
@@ -262,7 +275,7 @@ public abstract class Giocatore {
 	public abstract float givePower(); 		// quanto benessere può potenzialmente dare alle sue relazioni
 	public abstract float takePower(); 		// quanto benessere può potenzialmente togliere alle sue relazioni
 	public abstract float talk(int k);		//invia un messaggio alla relazione k con i modificatori descritti nei MODIFIERS
-
+	public abstract float colorHue();
 	
 	/**
 	 * Aggiunge o sottrae benessere, facendolo morire o replicare il giocatore se il benessere
@@ -279,8 +292,12 @@ public abstract class Giocatore {
 		}
 		
 		if (this.wealth >= MAX_WEALTH) { 			// tenta di replicare il giocatore
-			if (this.reproduce(!RANDOM_REPRODUCE))  // se si replica resetta il benessere
+			if (numberOfReproduce > 0 && this.reproduce(!RANDOM_REPRODUCE)) {
+				// se si replica resetta il benessere
 				this.resetWealth();
+				this.numberOfReproduce--;
+			}
+				
 			else
 				this.wealth = MAX_WEALTH; 			//altrimenti il benesssere rimane al massimo
 		}
@@ -443,9 +460,7 @@ public abstract class Giocatore {
 		
 		float brightness = (float) 0.5*(1+this.wealthPercent()); //la luminosita del colore aumenta con 
 		float hueGiocatore = 0;									//il benessere del giocatore
-		if (this.strategy() == TipoGiocatore.generoso) hueGiocatore = Generoso.COLORE;
-		if (this.strategy() == TipoGiocatore.mediatore) hueGiocatore = Mediatore.COLORE;
-		if (this.strategy() == TipoGiocatore.egoista) hueGiocatore = Egoista.COLORE;
+		hueGiocatore = this.colorHue();
 		
 		this.colore = Color.getHSBColor(hueGiocatore, 0.5f, brightness); 
 		this.getLabel().setBackground(this.getColore());	
@@ -457,7 +472,7 @@ public abstract class Giocatore {
 	}
 	
 
-	
+
 	
 	public boolean hasRelationshipWithEgoista() {
 		for (int i = 1; i < RELATIONSHIP_SIZE; i++) {

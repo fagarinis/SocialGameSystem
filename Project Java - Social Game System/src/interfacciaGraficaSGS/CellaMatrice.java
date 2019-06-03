@@ -11,10 +11,10 @@ import javax.swing.SwingConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EtchedBorder;
 
+import giocatori.TipoGiocatore;
 import socialGameSystem.Direzione;
 import socialGameSystem.Giocatore;
 import socialGameSystem.RelationalBoard;
-import socialGameSystem.TipoGiocatore;
 /**
  * Questa classe specifica il comportamento di ogni singola cella grafica nella matrice
  * @author Federico
@@ -146,6 +146,17 @@ public class CellaMatrice extends JLabel{
 	public void resetLabelBackground() {
 		label.setBackground(defaultCellBackground);
 	}
+	
+	/**
+	 * Rende la cella vuota e disponibile per essere nuovamente 
+	 * disponibile l'inserimento di un nuovo altro giocatore.
+	 */
+	public void makeCellEmpty() {
+		this.resetLabelBackground();
+		this.setPlayer(null);
+		this.setDirectionImage(null);	
+	}
+	
 	
 	/**
 	 * @param _giocatore Attenzione, il metodo puo' anche ricevere null come giocatore per svuotare la cella

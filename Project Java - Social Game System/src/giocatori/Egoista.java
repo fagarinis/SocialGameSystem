@@ -1,6 +1,9 @@
-package socialGameSystem;
+package giocatori;
 
 import java.awt.Color;
+
+import socialGameSystem.Direzione;
+import socialGameSystem.Giocatore;
 
 public class Egoista extends Giocatore {
 
@@ -11,6 +14,10 @@ public class Egoista extends Giocatore {
 	
 	public Egoista() {
 		super(TipoGiocatore.egoista);
+	}
+	
+	public Egoista(Direzione direzione, int riga, int colonna) {
+		super(TipoGiocatore.egoista, direzione, riga, colonna);
 	}
 	
 	@Override
@@ -43,7 +50,9 @@ public class Egoista extends Giocatore {
 	}
 
 
-
+	public float colorHue() {
+		return COLORE;
+	}
 
 
 

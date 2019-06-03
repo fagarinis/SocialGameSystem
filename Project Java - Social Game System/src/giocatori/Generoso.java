@@ -1,20 +1,30 @@
-package socialGameSystem;
+package giocatori;
 import java.awt.Color;
 
 import interfacciaGraficaSGS.GraphicsSGS;
+import socialGameSystem.Direzione;
+import socialGameSystem.Giocatore;
 
 public class Generoso extends Giocatore {
 	protected final static float COLORE = 85/255f;//Color.GREEN;
 
 	// parametri della strategia
 	private final static float BASE_GIVE = 6; // quando benessere puo' dare alle relazioni ogni messaggio
-	private final static float BASE_TAKE = 3f; // quando benessere puo' togliere dalle relazioni ogni messaggio
+	private final static float BASE_TAKE = 3; // quando benessere puo' togliere dalle relazioni ogni messaggio
 
 
 	public Generoso() {
 		super(TipoGiocatore.generoso);
 	}
 
+	public Generoso(Direzione direzione, int riga, int colonna) {
+		super(TipoGiocatore.generoso, direzione, riga, colonna);
+	}
+	
+	public float colorHue() {
+		return COLORE;
+	}
+	
 	@Override
 	public float givePower() {
 			return BASE_GIVE;
@@ -28,12 +38,8 @@ public class Generoso extends Giocatore {
 
 	@Override
 	//strategia giocatore generoso: aumenta il benessere alle sue relazioni
-	public float talk(int k) {/*
+	public float talk(int k) {
 	
-	
-		if (this.hasRelationshipWithEgoista()) 
-			return 0;
-		else*/
 		
 		float benesserePreso = this.takePower() * this.takeModifierOfRelationship(k);
 		this.addWealth(benesserePreso);

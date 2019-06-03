@@ -16,7 +16,6 @@ import javax.swing.border.EtchedBorder;
 import socialGameSystem.Direzione;
 import socialGameSystem.Giocatore;
 import socialGameSystem.RelationalBoard;
-import socialGameSystem.TipoGiocatore;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -29,6 +28,9 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.AdjustmentEvent;
 import javax.swing.event.ChangeListener;
+
+import giocatori.TipoGiocatore;
+
 import javax.swing.event.ChangeEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -43,7 +45,7 @@ public class GraphicsSGS{
 	public static JTextField textField_turn;
 	public static JTextField textField_alivePlayers;
 
-	public final static int righe = 55; //RIGHE DELLA MATRICE QUADRATA
+	public final static int righe = 35; //RIGHE DELLA MATRICE QUADRATA
 	public final static int colonne = righe;
 	public final static int numeroCelle = righe * colonne;
 	private int latoCella;
@@ -92,10 +94,6 @@ public class GraphicsSGS{
 	public void initialize() {
 		frmSocialGameSystem = new JFrame();
 		frmSocialGameSystem.setMinimumSize(new Dimension(1400, 485));
-	
-		
-		
-		
 		
 		frmSocialGameSystem.setIconImage(Toolkit.getDefaultToolkit().getImage(GraphicsSGS.class.getResource("/com/sun/java/swing/plaf/motif/icons/DesktopIcon.gif")));
 		frmSocialGameSystem.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -125,7 +123,10 @@ public class GraphicsSGS{
 				
 				
 				else if(StartStopButton.getText() == "Stop") {
-					RelationalBoard.stopRun();
+					while(RelationalBoard.isRunning()) {
+						RelationalBoard.stopRun();
+					}
+					
 					}
 				
 				
@@ -187,6 +188,7 @@ public class GraphicsSGS{
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
 				if(wasRunning) RelationalBoard.startRun();
+				wasRunning = false;
 			}
 		});
 		speedSlider.addChangeListener(new ChangeListener() {
@@ -194,9 +196,10 @@ public class GraphicsSGS{
 				
 				speedTextField.setText(String.valueOf(speedSlider.getValue()));
 				if(RelationalBoard.isRunning()) {
-					RelationalBoard.stopRun();
+					while(RelationalBoard.isRunning()) RelationalBoard.stopRun();
 					wasRunning = true;
 				}
+				
 			}
 		});
 		speedSlider.setValue(250);
@@ -266,25 +269,9 @@ public class GraphicsSGS{
 					
 				}).start();
 				
-				//contenitoreMatrice.setSize(1500,1500);
-				//matrix.setSize(1200,1200);
 			}
 		});
 		
-		/*pannello destro delle INFO
-		JPanel panel = new JPanel();
-		frmSocialGameSystem.getContentPane().add(panel, BorderLayout.EAST);
-		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-		JLabel lblNewLabel_1 = new JLabel("New label");
-		panel.add(lblNewLabel_1);
-		textField = new JTextField();
-		panel.add(textField);
-		textField.setColumns(10);
-		*/
-		
-				
-		//Color[] colors = new Color[] { Color.GREEN, Color.RED, Color.BLUE };
-		//Random random = new Random();
 				
 		//inserisci tutte le celle
 			for (int i = 0; i < celle.length; i++) {
@@ -301,70 +288,6 @@ public class GraphicsSGS{
 	
 	}
 	
-	
-	/**
- 	* @deprecated sostituito con CellaMatrice.Java
- 	* @return
- 	*/
-	/*
-	public JLabel creaLabelCella(){
-		JLabel label = new JLabel();
-		
-		
-	    label.setBackground(defaultCellBackground);
-	    label.setBorder(new CompoundBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), null));
-	    label.setOpaque(true);
-	    
-	    label.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				label.setBorder(new CompoundBorder(new EtchedBorder(EtchedBorder.RAISED, null, Color.LIGHT_GRAY), null));;
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				label.setBorder(new CompoundBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), null));
-			}
-			
-			
-			
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-				if (arg0.getButton() == MouseEvent.BUTTON1){ //pressione tasto sinistro
-				
-					int pos = labelPosition(label);
-					Giocatore player = RelationalBoard.getPlayer(pos/colonne, pos%colonne);
-					if(player != null) {
-						System.out.println(player.wealthPercent() + " "+player.direction()+ "("+player.getRiga()+","+player.getColonna()+")");
-					}
-					
-					
-					if (label.getBackground() == defaultCellBackground && chckbxAddremoveWealthOn.isSelected()) {
-					TipoGiocatore tipoPlayer = (TipoGiocatore) comboBox_tipoGiocatore.getSelectedItem();
-					Direzione direzione = (Direzione) comboBox_direzioni.getSelectedItem();
-					
-					int position = labelPosition(label); //posizione della cella
-					int riga = position/colonne;
-					int colonna = position % colonne;
-					
-					RelationalBoard.addNewPlayer(riga, colonna, tipoPlayer,direzione);
-				
-				}
-					else if (chckbxAddremoveWealthOn.isSelected()){
-						RelationalBoard.getPlayer(labelX(label), labelY(label)).addWealth(changedWealthOnClick);; //creare metodo getPlayerFromLabel
-						
-					}
-			}
-				else if (arg0.getButton() == MouseEvent.BUTTON3 && label.getBackground() != defaultCellBackground && chckbxAddremoveWealthOn.isSelected()) {
-					RelationalBoard.getPlayer(labelX(label), labelY(label)).addWealth(-changedWealthOnClick);; //creare metodo getPlayerFromLabel
-					
-					
-				}
-			}
-		});
-	    return label;
-	}
-	
-	*/
 	
 	
 	/**
@@ -393,22 +316,6 @@ public class GraphicsSGS{
 		getCella(x, y).setBackground(colore);
 	}
 	
-	public static int labelPosition(JLabel cella) {
-		for (int i = 0; i < celle.length; i++) {
-			if (celle[i] == cella) return i;
-		}
-		return -1;
-	}
-	
-	
 
-	/*
-	public static int labelX(JLabel cella){
-		return labelPosition(cella)/(colonne);
-	}
 	
-	public static int labelY(JLabel cella){
-		return labelPosition(cella)%(colonne);
-	}
-	*/
 }

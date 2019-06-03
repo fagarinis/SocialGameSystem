@@ -2,11 +2,16 @@ package socialGameSystem;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import giocatori.Egoista;
+import giocatori.Generoso;
+import giocatori.Mediatore;
+import giocatori.TipoGiocatore;
 import interfacciaGraficaSGS.CellaMatrice;
 import interfacciaGraficaSGS.GraphicsSGS;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.sql.Time;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -20,12 +25,12 @@ public class RelationalBoard{
 	static boolean isRunning = false;
 	
 	static int Turn = 0;
-	private static Giocatore[][] cella; //matrice di oggetti giocatori
+	private static Giocatore[][] matriceGiocatori; //matrice di oggetti giocatori
 	private static int righe;
 	private static int colonne;
 	
 	public RelationalBoard(int _righe, int _colonne) {
-		cella = new Giocatore[_righe][_colonne];
+		matriceGiocatori = new Giocatore[_righe][_colonne];
 		righe = _righe;
 		colonne = _colonne;
 	}
@@ -59,7 +64,7 @@ public class RelationalBoard{
 	
 	public static Giocatore getPlayer(int riga, int colonna) {
 		try {
-		return cella[riga][colonna];
+		return matriceGiocatori[riga][colonna];
 		}
 		catch (ArrayIndexOutOfBoundsException e) {
 			
@@ -69,6 +74,7 @@ public class RelationalBoard{
 
 	public static int numberOfNeighboursInCell(int riga, int colonna) {
 		int popolazioneIntornoCella = 0;
+		
 		if (getPlayer(riga-1, colonna-1) != null) popolazioneIntornoCella+=1; 
 		if (getPlayer(riga-1, colonna) != null) popolazioneIntornoCella+=1;
 		if (getPlayer(riga-1, colonna+1) != null) popolazioneIntornoCella+=1;
@@ -77,6 +83,7 @@ public class RelationalBoard{
 		if (getPlayer(riga+1, colonna-1) != null) popolazioneIntornoCella+=1;
 		if (getPlayer(riga+1, colonna) != null) popolazioneIntornoCella+=1;
 		if (getPlayer(riga+1, colonna+1) != null) popolazioneIntornoCella+=1;
+		
 		
 		return popolazioneIntornoCella;
 	}
@@ -89,7 +96,7 @@ public class RelationalBoard{
 	
 	public static boolean isEmptyCell(int riga, int colonna) {
 		try {
-			return cella[riga][colonna] == null;
+			return matriceGiocatori[riga][colonna] == null;
 		}catch (ArrayIndexOutOfBoundsException e) {
 			return false; //se la coordinata e' fuori dalla board
 		}
@@ -101,8 +108,12 @@ public class RelationalBoard{
 	 * Inserisce un nuovo giocatore nella board, settandone il colore.
 	 */
 	public static void addNewPlayer(int riga, int colonna, TipoGiocatore tipoPlayer, Direzione direzione) {
-		Giocatore player = creaGiocatore(tipoPlayer, direzione, riga, colonna);
-		cella[riga][colonna] = player;
+		Giocatore player = null;
+		if (tipoPlayer == TipoGiocatore.egoista) player = new Egoista(direzione, riga, colonna);
+		if (tipoPlayer == TipoGiocatore.mediatore) player = new Mediatore(direzione, riga, colonna);
+		if (tipoPlayer == TipoGiocatore.generoso) player = new Generoso(direzione, riga, colonna);
+		
+		matriceGiocatori[riga][colonna] = player;
 		addAlivePlayerTextField(1, player);
 		
 		
@@ -135,7 +146,9 @@ public class RelationalBoard{
 	public static void addRandomPlayers(int n) {
 		boolean wasRunning = false;
 		if(isRunning()) {
-			stopRun();
+			while(isRunning) {
+				stopRun();
+			}
 			wasRunning = true;
 		}
 		while (n > 0) {
@@ -155,36 +168,6 @@ public class RelationalBoard{
 		//updateAllPlayerRelationships();
 	}
 	
-	private static Giocatore creaGiocatore(TipoGiocatore strategy, Direzione direzione, int riga, int colonna) {
-		Giocatore nuovoGiocatore = null;
-		if (strategy == TipoGiocatore.generoso) nuovoGiocatore = new Generoso();
-		if (strategy == TipoGiocatore.mediatore) nuovoGiocatore = new Mediatore();
-		if (strategy == TipoGiocatore.egoista) nuovoGiocatore = new Egoista();
-		
-		CellaMatrice labelOfPlayer = CellaMatrice.getCella(riga, colonna);
-		
-		nuovoGiocatore.setCella(labelOfPlayer);
-		
-		nuovoGiocatore.setDirection(direzione); //deve essere prima di .setPlayer
-		labelOfPlayer.setPlayer(nuovoGiocatore);
-		
-		
-		
-		
-		nuovoGiocatore.setPosition(riga, colonna);
-		nuovoGiocatore.updateColore();
-		
-		return nuovoGiocatore;
-	}
-	/*
-	public static void updateAllPlayerRelationships() {
-		for (Giocatore[] riga: cella)
-			for (Giocatore player: riga) {
-				if (player != null) {
-					player.updateRelationship();
-				}
-			}
-	}*/
 	
 	public float getAliveGenerosiPercent(){
 		return this.AliveGenerosi/this.AlivePlayers * 100;
@@ -199,18 +182,19 @@ public class RelationalBoard{
 	}
 	
 	public static void resetBoard() {
-		stopRun();
-		for (Giocatore[] riga: cella)
+		while(isRunning()) stopRun();
+		
+		for (Giocatore[] riga: matriceGiocatori)
 			for (Giocatore player: riga) {
 				if (player != null)player.die();
 			}
 		
 		resetTurnTextField();
-		resetAlivePlayersTextField();
+		//resetAlivePlayersTextField();
 	}
 	
 	public static boolean isRunning() {
-		return isRunning == true;
+		return isRunning;
 	}
 	
 	public static void startRun() {
@@ -232,9 +216,6 @@ public class RelationalBoard{
 		GraphicsSGS.timer.cancel();
 		isRunning = false;
 		GraphicsSGS.stepButton.setEnabled(true);
-		GraphicsSGS.comboBox_tipoGiocatore.setEnabled(true);
-		GraphicsSGS.comboBox_direzioni.setEnabled(true);
-		//timer.purge();
 		GraphicsSGS.StartStopButton.setText("Start");
 	}
 	
@@ -242,15 +223,22 @@ public class RelationalBoard{
 	 * Resetta l'aspetto grafico e logico della cella
 	 */
 	public static void deleteCella(int riga, int colonna) {
-
-		cella[riga][colonna] = null;
+		Giocatore giocatoreDaEliminare = matriceGiocatori[riga][colonna];
+		matriceGiocatori[riga][colonna] = null;
+		if (giocatoreDaEliminare != null) {
+			giocatoreDaEliminare.getCella().makeCellEmpty();
+			RelationalBoard.AlivePlayers -= 1;
+			GraphicsSGS.textField_alivePlayers.setText(String.valueOf(RelationalBoard.AlivePlayers));
+		}
+		
 	}
 	
 
 	
+	
 	public static void step() {
 		
-		for (Giocatore[] riga: cella)
+		for (Giocatore[] riga: matriceGiocatori)
 			for (Giocatore player: riga) {
 				if (player != null) {
 					player.addTurn(); //aggiunge 1 al turno in cui il giocatore e' stato vivo
