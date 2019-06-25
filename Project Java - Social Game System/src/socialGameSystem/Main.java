@@ -13,8 +13,8 @@ import interfacciaGraficaSGS.GraphicsSGS;
  * oppure morira' se il suo benessere si esaurisce oppure se il numero di vicini non e' compreso tra 2 e 3 inclusi
  * 
  * @author Federico Agarinis
- * @version 1.2
- * @since 9-05-2019
+ * @version 1.3
+ * @since 3-06-2019
  */
 
 public class Main {

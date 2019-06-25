@@ -10,7 +10,7 @@ public class Generoso extends Giocatore {
 
 	// parametri della strategia
 	private final static float BASE_GIVE = 6; // quando benessere puo' dare alle relazioni ogni messaggio
-	private final static float BASE_TAKE = 3; // quando benessere puo' togliere dalle relazioni ogni messaggio
+	private final static float BASE_TAKE = 1; // quando benessere puo' togliere dalle relazioni ogni messaggio
 
 
 	public Generoso() {
@@ -27,13 +27,13 @@ public class Generoso extends Giocatore {
 	
 	@Override
 	public float givePower() {
-			return BASE_GIVE;
+			return BASE_GIVE ;
 	}
 
 	@Override
 	public float takePower() {
 		// TODO Auto-generated method stub
-		return BASE_TAKE;
+		return BASE_TAKE ;
 	}
 
 	@Override

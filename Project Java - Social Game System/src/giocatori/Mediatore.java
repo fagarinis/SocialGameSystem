@@ -34,30 +34,10 @@ public class Mediatore extends Giocatore {
 	}
 
 	@Override
-	//Strategia giocatore mediatore: aumenta il benessere a chi glielo ha aumentato il turno precedente e lo
-	//ruba a chi glielo ha rubato
-	public float talk(int k) {/*
-		if (this.lastMessageFrom(k) == 0 && this.hasRelationshipWithEgoista()) {
-			return 0;		
-		}
-		
-		if (this.lastMessageFrom(k) > 0) {
-			return givePower() * this.giveModifierOfRelationship(k);		
-		}
-		if (this.lastMessageFrom(k) < 0) {
-			float benessereRubato = takePower() * this.giveModifierOfRelationship(k);
-			
-			this.addWealth(benessereRubato);
-			return -benessereRubato;
-		}
-		
-		if (this.lastMessageFrom(k) == 0 && this.hasRelationshipWithGeneroso()) {
-			return givePower() * this.giveModifierOfRelationship(k);		
-		}
-		
-		return 0; //returna 0 altrimenti*/
+	public float talk(int k) {
 		float benesserePreso = this.takePower() * this.takeModifierOfRelationship(k);
 		this.addWealth(benesserePreso);
+		
 		float benessereDato = this.givePower() * this.giveModifierOfRelationship(k);
 		return benessereDato - benesserePreso;
 	}

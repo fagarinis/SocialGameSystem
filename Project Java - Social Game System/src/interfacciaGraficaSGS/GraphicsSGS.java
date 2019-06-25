@@ -15,6 +15,7 @@ import javax.swing.border.EtchedBorder;
 
 import socialGameSystem.Direzione;
 import socialGameSystem.Giocatore;
+import socialGameSystem.Parameters;
 import socialGameSystem.RelationalBoard;
 
 import java.awt.event.MouseAdapter;
@@ -45,7 +46,7 @@ public class GraphicsSGS{
 	public static JTextField textField_turn;
 	public static JTextField textField_alivePlayers;
 
-	public final static int righe = 35; //RIGHE DELLA MATRICE QUADRATA
+	public final static int righe = Parameters.righe; //RIGHE DELLA MATRICE QUADRATA
 	public final static int colonne = righe;
 	public final static int numeroCelle = righe * colonne;
 	private int latoCella;
@@ -61,21 +62,28 @@ public class GraphicsSGS{
 	private static boolean wasRunning = false;
 	JComboBox comboBox;
 	JComboBox comboBox_1;
-	
-	public static JComboBox comboBox_tipoGiocatore;
-	public static JComboBox comboBox_direzioni;
 	public static RelationalBoard board = new RelationalBoard(righe, colonne);
 	
 	private final static Color defaultCellBackground = Color.GRAY;
 	
 	
 	static final int changedWealthOnClick = 3;
-	static JCheckBox chckbxAddremoveWealthOn;
 	public static JButton stepButton;
 	public static JButton StartStopButton;
 	private static JTextField speedTextField;
 	private static JSlider speedSlider;
 	private JTextField textField;
+	
+	public static ButtonGroup G; // il gruppo dei bottoni del tipo giocatore (solo uno puo' essere selezionato)
+	public static JRadioButton RadioButtonGeneroso;
+	public static JRadioButton RadioButtonMediatore;
+	public static JRadioButton RadioButtonEgoista;
+	
+	public static ButtonGroup D; // il gruppo dei bottoni della direzione (solo uno puo' essere selezionato)
+	public static JRadioButton radioButtonUp;
+	public static JRadioButton radioButtonRight;
+	public static JRadioButton radioButtonLeft;
+	public static JRadioButton radioButtonDown;
 	
 	public static int getSpeed() {
 		return speedSlider.getMaximum()+1 -speedSlider.getValue();
@@ -208,7 +216,7 @@ public class GraphicsSGS{
 		panel_1.add(speedSlider);
 		
 		JPanel panel_2 = new JPanel();
-		menu.add(panel_2, BorderLayout.CENTER);
+		menu.add(panel_2, BorderLayout.EAST);
 		
 		JButton btnGenrandomplayers = new JButton("GenRandomPlayers");
 		btnGenrandomplayers.addActionListener(new ActionListener() {
@@ -218,21 +226,8 @@ public class GraphicsSGS{
 		});
 		panel_2.add(btnGenrandomplayers);
 		
-		chckbxAddremoveWealthOn = new JCheckBox("add/remove Wealth on click");
-		panel_2.add(chckbxAddremoveWealthOn);
-		
-		JLabel lblNewLabel = new JLabel("newPlayer");
-		panel_2.add(lblNewLabel);
-		
-		comboBox_tipoGiocatore = new JComboBox();
-		comboBox_tipoGiocatore.setModel(new DefaultComboBoxModel(TipoGiocatore.values()));
-		comboBox_tipoGiocatore.setMaximumRowCount(3);
-		panel_2.add(comboBox_tipoGiocatore);
-		
-		comboBox_direzioni = new JComboBox();
-		comboBox_direzioni.setModel(new DefaultComboBoxModel(Direzione.values()));
-		comboBox_direzioni.setMaximumRowCount(4);
-		panel_2.add(comboBox_direzioni);
+		JPanel panel_3 = new JPanel();
+		menu.add(panel_3, BorderLayout.CENTER);
 		
 		
 		
@@ -251,7 +246,75 @@ public class GraphicsSGS{
 		
 		contenitoreMatrice.add(matrix);
 		
+		JPanel panel = new JPanel();
+		frmSocialGameSystem.getContentPane().add(panel, BorderLayout.EAST);
+		panel.setLayout(new GridLayout(0, 1, 0, 0));
+		
+		JLabel label_3 = new JLabel("");
+		panel.add(label_3);
+		
+		JLabel label = new JLabel("");
+		panel.add(label);
+		
+		JLabel label_1 = new JLabel("");
+		panel.add(label_1);
+		
+		JToolBar toolBar = new JToolBar();
+		toolBar.setToolTipText("");
+		toolBar.setName("");
+		toolBar.setOrientation(SwingConstants.VERTICAL);
+		toolBar.setFloatable(false);
+		panel.add(toolBar);
+		
+		JLabel lblNewPlayer = new JLabel("New Player:");
+		toolBar.add(lblNewPlayer);
+		lblNewPlayer.setVerticalAlignment(SwingConstants.BOTTOM);
+		
+		RadioButtonGeneroso = new JRadioButton(TipoGiocatore.generoso.toString());
+		RadioButtonGeneroso.setSelected(true);
+		RadioButtonGeneroso.setActionCommand(TipoGiocatore.generoso.toString());
+		toolBar.add(RadioButtonGeneroso);
+		
+		RadioButtonMediatore = new JRadioButton(TipoGiocatore.mediatore.toString());
+		RadioButtonMediatore.setActionCommand(TipoGiocatore.mediatore.toString());
+		toolBar.add(RadioButtonMediatore);
+		
+		RadioButtonEgoista = new JRadioButton(TipoGiocatore.egoista.toString());
+		RadioButtonEgoista.setActionCommand(TipoGiocatore.egoista.toString());
+		toolBar.add(RadioButtonEgoista);
+		
+		ButtonGroup G = new ButtonGroup();
+		G.add(RadioButtonGeneroso);
+		G.add(RadioButtonMediatore);
+		G.add(RadioButtonEgoista);
+		
+		JToolBar toolBar_1 = new JToolBar();
+		toolBar_1.setOrientation(SwingConstants.VERTICAL);
+		panel.add(toolBar_1);
+		
+		JLabel lblDirection = new JLabel("Direction:");
+		toolBar_1.add(lblDirection);
+		lblDirection.setVerticalAlignment(SwingConstants.BOTTOM);
+		
+		radioButtonUp = new JRadioButton(Direzione.up.toString());
+		radioButtonUp.setSelected(true);
+		toolBar_1.add(radioButtonUp);
+		
+		radioButtonRight = new JRadioButton(Direzione.right.toString());
+		toolBar_1.add(radioButtonRight);
+		
+		radioButtonLeft = new JRadioButton(Direzione.left.toString());
+		toolBar_1.add(radioButtonLeft);
+		
+		radioButtonDown = new JRadioButton(Direzione.down.toString());
+		toolBar_1.add(radioButtonDown);
 	
+		
+		ButtonGroup D = new ButtonGroup();
+		D.add(radioButtonUp);
+		D.add(radioButtonRight);
+		D.add(radioButtonLeft);
+		D.add(radioButtonDown);
 		
 		frmSocialGameSystem.addComponentListener(new ComponentAdapter() {
 			@Override

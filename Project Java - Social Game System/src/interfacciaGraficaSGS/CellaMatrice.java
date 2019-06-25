@@ -14,6 +14,7 @@ import javax.swing.border.EtchedBorder;
 import giocatori.TipoGiocatore;
 import socialGameSystem.Direzione;
 import socialGameSystem.Giocatore;
+import socialGameSystem.Parameters;
 import socialGameSystem.RelationalBoard;
 /**
  * Questa classe specifica il comportamento di ogni singola cella grafica nella matrice
@@ -72,7 +73,7 @@ public class CellaMatrice extends JLabel{
 				if (label.getBackground() != defaultCellBackground)label.setToolTipText("<html>"+
 								"Strategy: "+String.valueOf(getGiocatore().strategy()) + 
 								"<br>Direction: "+String.valueOf(getGiocatore().direction()) + 
-								"<br>Wealth: "+ (int) getGiocatore().benessere()+"/"+ (int)Giocatore.MAX_WEALTH +
+								"<br>Wealth: "+ (int) getGiocatore().benessere()+"/"+ (int)Parameters.MAX_WEALTH +
 								"</html>");
 			}
 			@Override
@@ -87,35 +88,18 @@ public class CellaMatrice extends JLabel{
 			@Override
 			public void mousePressed(MouseEvent arg0) {
 				 // Pressione tasto sinistro -> crea nuovo giocatore
-				if (arg0.getButton() == MouseEvent.BUTTON1){
-				
-					Giocatore player = getGiocatore();
-					
+				if (arg0.getButton() == MouseEvent.BUTTON1){			
 					//se nella cella NON c'è un giocatore, aggiungilo
 					if (label.getBackground() == defaultCellBackground /*&& GraphicsSGS.chckbxAddremoveWealthOn.isSelected()*/) {
-					TipoGiocatore tipoPlayer = (TipoGiocatore) GraphicsSGS.comboBox_tipoGiocatore.getSelectedItem();
-					Direzione direzione = (Direzione) GraphicsSGS.comboBox_direzioni.getSelectedItem();
+					TipoGiocatore tipoPlayer = GraphicsSGS.RadioButtonGeneroso.isSelected()? TipoGiocatore.generoso: GraphicsSGS.RadioButtonMediatore.isSelected()? TipoGiocatore.mediatore: TipoGiocatore.egoista;
+					Direzione direzione = GraphicsSGS.radioButtonUp.isSelected()? Direzione.up: GraphicsSGS.radioButtonLeft.isSelected()? Direzione.left: GraphicsSGS.radioButtonRight.isSelected()? Direzione.right: Direzione.down;
 					RelationalBoard.addNewPlayer(getRiga(), getColonna(), tipoPlayer,direzione);
-					
-					
+					}
 				
 				}
-					// Se nella cella c'e' un giocatore aumentagli il benessere
-					//else if (GraphicsSGS.chckbxAddremoveWealthOn.isSelected()){
-						//RelationalBoard.getPlayer(riga, colonna).addWealth(GraphicsSGS.changedWealthOnClick); 
-						
-					//}
 			}
-				//Pressione tasto Destro
-				else if (arg0.getButton() == MouseEvent.BUTTON3 && label.getBackground() != defaultCellBackground && GraphicsSGS.chckbxAddremoveWealthOn.isSelected()) {
-					RelationalBoard.getPlayer(riga, colonna).addWealth(-GraphicsSGS.changedWealthOnClick);  
-					
-					
-				}
-			}
+			
 		});
-		
-		
 	}
 	
 	public JLabel getLabel() {

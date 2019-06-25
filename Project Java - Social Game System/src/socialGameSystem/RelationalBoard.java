@@ -90,7 +90,7 @@ public class RelationalBoard{
 	
 	//controlla se la cella e' sovrappopolata
 	public static boolean isCrowded(int riga, int colonna) {
-		return numberOfNeighboursInCell(riga, colonna) > Giocatore.OVERPOPULATION;
+		return numberOfNeighboursInCell(riga, colonna) > Parameters.OVERPOPULATION;
 	}
 	
 	

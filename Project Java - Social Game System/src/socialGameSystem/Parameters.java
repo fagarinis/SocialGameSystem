@@ -16,16 +16,19 @@ public class Parameters {
 	public final static int UNDERPOPULATION = 2; 				// meno relazioni di queste e il giocatore perde benessere
 	public final static int OVERPOPULATION_HEALTH_LOST = 90; 	// benessere perso per sovrappopolazione/depopolazione
 	
+	//Le seguenti variabili vanno cambiate solamente se si vuole sperimentare un diverso tipo di replicazione dei giocatori
+	public final static boolean RANDOM_REPRODUCE = false; 	//se true i giocatori si replicheranno a caso sulla mappa
+	public final static int TURNS_OF_IMMUNITY = 0;         //turni in cui un giocatore e' immune agli effetti dell under/overpopulation
 	
 	//Parametri GUI
-	public final static int righe = 40; //RIGHE DELLA MATRICE QUADRATA
+	public final static int righe = 50; // Righe della matrice (e anche le colonne, dato che e' quadrata)
 	
 	// Modificatori take/give wealth per tipo di relazione {0, 1, 2, 3, 4, 5, 6, 7}
 	// implementazione con 9 relazioni dove 0 è la posizione del giocatore ed e' girato verso l'alto:
 	// 1 2 3
 	// 4 ^ 5
 	// 6 7 8
-	private final static float[] GIVE_MODIFIER = { 
+	final static float[] GIVE_MODIFIER = { 
 			0, 		// 0 (^): il Giocatore stesssso
 			1,		// 1: Superiore 
 			3, 		// 2: Infatuazione 
@@ -36,7 +39,7 @@ public class Parameters {
 			0.1f, 	// 7: Inimicizia 
 			0.25f 	// 8: Dipendente 
 	};
-	private final static float[] TAKE_MODIFIER = {
+	final static float[] TAKE_MODIFIER = {
 			0, 
 			0.25f, 	// 1: Superiore 
 			0.1f, 	// 2: Infatuazione
@@ -57,5 +60,9 @@ public class Parameters {
 
 	public static float takeModifierOfRelationship(int k) {
 		return TAKE_MODIFIER[k];
+	}
+	
+	public static int getRighe() {
+		return Parameters.righe;
 	}
 }
