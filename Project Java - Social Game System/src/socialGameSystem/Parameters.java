@@ -2,9 +2,7 @@ package socialGameSystem;
 
 
 public class Parameters {
-/**
- * e' Necessasrio ancora implementare questa classe nelle altre
- */
+
 	// Parametri statici per tutti i giocatori
 	public final static float MIN_WEALTH = 0; // benessere Quando il giocatore muore
 	public final static float MAX_WEALTH = 100; // benessere Quando il giocatore si replica

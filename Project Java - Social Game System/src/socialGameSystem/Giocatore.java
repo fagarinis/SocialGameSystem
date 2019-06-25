@@ -16,7 +16,6 @@ import interfacciaGraficaSGS.GraphicsSGS;
  * questa classe rappresenta ogni singola istanza di un giocatore sullo scacchiere relazionale e include
  * i metodi che devono essere implementati dalle sottoclassi (che sono tipologie specifiche di giocatore).
  * 
- * @author Federico Agarinis
  *
  */
 public abstract class Giocatore {

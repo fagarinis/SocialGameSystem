@@ -12,7 +12,6 @@ import interfacciaGraficaSGS.GraphicsSGS;
  * Quando un giocatore raggiunge il massimo del benessere tentera' di riprodursi 
  * oppure morira' se il suo benessere si esaurisce oppure se il numero di vicini non e' compreso tra 2 e 3 inclusi
  * 
- * @author Federico Agarinis
  * @version 1.3
  * @since 3-06-2019
  */

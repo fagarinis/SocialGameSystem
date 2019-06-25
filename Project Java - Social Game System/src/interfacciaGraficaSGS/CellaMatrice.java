@@ -18,7 +18,6 @@ import socialGameSystem.Parameters;
 import socialGameSystem.RelationalBoard;
 /**
  * Questa classe specifica il comportamento di ogni singola cella grafica nella matrice
- * @author Federico
  *
  */
 public class CellaMatrice extends JLabel{
