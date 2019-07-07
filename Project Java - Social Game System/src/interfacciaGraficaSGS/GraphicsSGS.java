@@ -46,33 +46,31 @@ public class GraphicsSGS{
 	public static JTextField textField_turn;
 	public static JTextField textField_alivePlayers;
 
-	public final static int righe = Parameters.righe; //RIGHE DELLA MATRICE QUADRATA
-	public final static int colonne = righe;
-	public final static int numeroCelle = righe * colonne;
+	public final static int righe						= Parameters.righe; //RIGHE DELLA MATRICE QUADRATA
+	public final static int colonne						= righe;
+	public final static int numeroCelle 				= righe * colonne;
+	private final static int RANDOM_PLAYERS_GENERATED 	= (int) numeroCelle/5;
 	private int latoCella;
-	private final static int RANDOM_PLAYERS_GENERATED = (int) numeroCelle/5;
 	
-	public static int TURN_SPEED = 25; //quanto velocemenente avanzano i turni
-	public static Timer timer = new Timer();
+	public static int 	TURN_SPEED 	= 25; 			//quanto velocemenente avanzano i turni
+	public static Timer timer 		= new Timer();
 	
-	public static JLabel[] celle = new JLabel[numeroCelle];
-	protected JPanel matrix = new JPanel();
+	public static JLabel[] celle 	= new JLabel[numeroCelle];
+	
+	protected JPanel matrix 		= new JPanel();
 	protected static Component contenitoreMatrice;
 	
-	private static boolean wasRunning = false;
-	JComboBox comboBox;
-	JComboBox comboBox_1;
-	public static RelationalBoard board = new RelationalBoard(righe, colonne);
+	private static boolean 			wasRunning 	= false;
+	public 	static RelationalBoard 	board 		= new RelationalBoard(righe, colonne);
 	
 	private final static Color defaultCellBackground = Color.GRAY;
 	
-	
 	static final int changedWealthOnClick = 3;
-	public static JButton stepButton;
-	public static JButton StartStopButton;
-	private static JTextField speedTextField;
-	private static JSlider speedSlider;
-	private JTextField textField;
+	public 	static 	JButton 	stepButton;
+	public 	static 	JButton 	StartStopButton;
+	private static 	JTextField 	speedTextField;
+	private static	JSlider 	speedSlider;
+
 	
 	public static ButtonGroup G; // il gruppo dei bottoni del tipo giocatore (solo uno puo' essere selezionato)
 	public static JRadioButton RadioButtonGeneroso;

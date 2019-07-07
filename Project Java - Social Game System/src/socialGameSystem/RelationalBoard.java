@@ -17,15 +17,15 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class RelationalBoard{
-	static int AlivePlayers = 0;
-	static int AliveGenerosi = 0;
-	static int AliveMediatori = 0;
-	static int AliveEgoisti = 0;
+	static int Turn 			= 0;
+	static int AlivePlayers 	= 0;
+	static int AliveGenerosi 	= 0;
+	static int AliveMediatori 	= 0;
+	static int AliveEgoisti 	= 0;
 	
-	static boolean isRunning = false;
-	
-	static int Turn = 0;
+	static boolean 	isRunning 	= false;
 	private static Giocatore[][] matriceGiocatori; //matrice di oggetti giocatori
+	
 	private static int righe;
 	private static int colonne;
 	

@@ -27,7 +27,6 @@ public class CellaMatrice extends JLabel{
 	private static CellaMatrice[] celle = null; //contiene tutte le celle create
 	private static int top = 0; //punta alla prossima posizione vuota dell'array celle
 	
-	
 	private int index; // e' l'indice di posizionamento della cella all'intero dell'array celle
 	private JLabel label;
 	private final static Color defaultCellBackground = Color.GRAY;

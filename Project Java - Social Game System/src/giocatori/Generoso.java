@@ -37,10 +37,8 @@ public class Generoso extends Giocatore {
 	}
 
 	@Override
-	//strategia giocatore generoso: aumenta il benessere alle sue relazioni
+
 	public float talk(int k) {
-	
-		
 		float benesserePreso = this.takePower() * this.takeModifierOfRelationship(k);
 		this.addWealth(benesserePreso);
 		float benessereDato = this.givePower() * this.giveModifierOfRelationship(k);

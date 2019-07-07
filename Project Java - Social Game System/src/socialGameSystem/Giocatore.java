@@ -15,7 +15,10 @@ import interfacciaGraficaSGS.GraphicsSGS;
 /**
  * questa classe rappresenta ogni singola istanza di un giocatore sullo scacchiere relazionale e include
  * i metodi che devono essere implementati dalle sottoclassi (che sono tipologie specifiche di giocatore).
- * 
+ * E' astratta perché tutti i giocatori saranno sempre una sottoclasse di questa classe e dovranno implementare
+ * dei metodi per cui differiscono, in particolare la quantita' di benessere che inviano e ricevono, inoltre
+ * questa implementazione permette di sperimentare con facilita' cosa succede se si cambia il modo di ricevere/inviare
+ * messaggi di un giocatore di strategia x.
  *
  */
 public abstract class Giocatore {
@@ -23,21 +26,21 @@ public abstract class Giocatore {
 	private static long playerIdCounter = 0;
 	
 	// Parametri del singolo giocatore
-	private TipoGiocatore strategy; 				// Generoso, Mediatore, Egoista
-	private float wealth; 							// Valore del benessere 
-	private boolean death = false;						
-	private int turnsAlive = 0;						
-	private int numberOfReproduce = 7;				//quante volte il giocatore si può replicare
+	private TipoGiocatore 	strategy; 															
+	private float 			wealth; 															
+	private boolean 		death 				= false;						
+	private int 			turnsAlive 			= 0;						
+	private int 			numberOfReproduce 	= Parameters.NUMBER_OF_REPRODUCE;
 	
-	//Ultimi messaggi ricevuti (non piu' usato)
+	//Ultimi messaggi ricevuti (non piu' usato, prima la strategia dei mediatori dipendeva dall'ultimo messaggio ricevuto)
 	private float[] lastMessages = new float[Parameters.RELATIONSHIP_SIZE]; 
 	
 	// Parametri del singolo giocatore per l'interfaccia grafica
-	private Color colore;
-	private Direzione direzione;						// Direzione sulla Board: up, right, down, left
-	private int riga, colonna; 						// Coordinate sulla Board
-	private CellaMatrice cella;
-	private long playerId;
+	private int 			riga, colonna; 	// Coordinate sulla Board
+	private Color 			colore;
+	private Direzione 		direzione;		// Direzione sulla Board: up, right, down, left
+	private CellaMatrice 	cella;
+	private long 			playerId;		// Per usi futuri
 
 
 	/**
@@ -60,8 +63,8 @@ public abstract class Giocatore {
 		
 		// Assegnazione della cella (GUI)
 		CellaMatrice labelOfPlayer = CellaMatrice.getCella(riga, colonna);
-		this.setCella(labelOfPlayer);
-		labelOfPlayer.setPlayer(this); // Il label deve sapere il giocatore che contiene
+		this.setCella(labelOfPlayer);	//il giocatore contiene la cella dove risiede
+		labelOfPlayer.setPlayer(this); // Il label contiene il giocatore che ospita
 		this.updateColore();
 
 	}
@@ -70,7 +73,10 @@ public abstract class Giocatore {
 	public void addTurn() {
 		this.turnsAlive += 1;
 	}
-	
+	/**
+	 * tale metodo viene usato solamente se si conferiscono turni di immunita' alla morte alla
+	 * nascita del giocatore con il parametro {@link Parameters#TURNS_OF_IMMUNITY}
+	 */
 	public boolean isImmune() {
 		return this.turnsAlive < Parameters.TURNS_OF_IMMUNITY;
 	}
@@ -161,28 +167,27 @@ public abstract class Giocatore {
 		if (randomStrategySpawn) strategia = TipoGiocatore.values()[new Random().nextInt(TipoGiocatore.values().length)];
 		else strategia = this.strategy();
 		//
-		if (RelationalBoard.isEmptyCell(riga-1, colonna-1) && RelationalBoard.numberOfNeighboursInCell(riga-1, colonna-1) == numeroVicini) RelationalBoard.addNewPlayer(riga-1, colonna-1, strategia, Direzione.values()[new Random().nextInt(Direzione.values().length)]);
-		if (RelationalBoard.isEmptyCell(riga-1, colonna) && RelationalBoard.numberOfNeighboursInCell(riga-1, colonna) == numeroVicini)RelationalBoard.addNewPlayer(riga-1, colonna, strategia, Direzione.values()[new Random().nextInt(Direzione.values().length)]);
-		if (RelationalBoard.isEmptyCell(riga-1, colonna+1) && RelationalBoard.numberOfNeighboursInCell(riga-1, colonna+1) == numeroVicini)RelationalBoard.addNewPlayer(riga-1, colonna+1, strategia, Direzione.values()[new Random().nextInt(Direzione.values().length)]);
-		if (RelationalBoard.isEmptyCell(riga, colonna-1) && RelationalBoard.numberOfNeighboursInCell(riga, colonna-1) == numeroVicini)RelationalBoard.addNewPlayer(riga, colonna-1, strategia, Direzione.values()[new Random().nextInt(Direzione.values().length)]);
-		if (RelationalBoard.isEmptyCell(riga, colonna+1) && RelationalBoard.numberOfNeighboursInCell(riga, colonna+1) == numeroVicini)RelationalBoard.addNewPlayer(riga, colonna+1, strategia, Direzione.values()[new Random().nextInt(Direzione.values().length)]);
-		if (RelationalBoard.isEmptyCell(riga+1, colonna-1) && RelationalBoard.numberOfNeighboursInCell(riga+1, colonna-1) == numeroVicini)RelationalBoard.addNewPlayer(riga+1, colonna-1, strategia, Direzione.values()[new Random().nextInt(Direzione.values().length)]);
-		if (RelationalBoard.isEmptyCell(riga+1, colonna) && RelationalBoard.numberOfNeighboursInCell(riga+1, colonna) == numeroVicini)RelationalBoard.addNewPlayer(riga+1, colonna, strategia, Direzione.values()[new Random().nextInt(Direzione.values().length)]);
-		if (RelationalBoard.isEmptyCell(riga+1, colonna+1) && RelationalBoard.numberOfNeighboursInCell(riga+1, colonna+1) == numeroVicini)RelationalBoard.addNewPlayer(riga+1, colonna+1, strategia, Direzione.values()[new Random().nextInt(Direzione.values().length)]);
+		if (RelationalBoard.isEmptyCell(riga -1	, colonna -1) && RelationalBoard.numberOfNeighboursInCell(riga -1, colonna -1) == numeroVicini) RelationalBoard.addNewPlayer(riga -1, colonna -1, 	strategia, Direzione.values()[new Random().nextInt(Direzione.values().length)]);
+		if (RelationalBoard.isEmptyCell(riga -1	, colonna	) && RelationalBoard.numberOfNeighboursInCell(riga -1, colonna	 ) == numeroVicini) RelationalBoard.addNewPlayer(riga -1, colonna	, 	strategia, Direzione.values()[new Random().nextInt(Direzione.values().length)]);
+		if (RelationalBoard.isEmptyCell(riga -1	, colonna +1) && RelationalBoard.numberOfNeighboursInCell(riga -1, colonna +1) == numeroVicini) RelationalBoard.addNewPlayer(riga -1, colonna +1, 	strategia, Direzione.values()[new Random().nextInt(Direzione.values().length)]);
+		if (RelationalBoard.isEmptyCell(riga	, colonna -1) && RelationalBoard.numberOfNeighboursInCell(riga	 , colonna -1) == numeroVicini) RelationalBoard.addNewPlayer(riga	, colonna -1, 	strategia, Direzione.values()[new Random().nextInt(Direzione.values().length)]);
+		if (RelationalBoard.isEmptyCell(riga	, colonna +1) && RelationalBoard.numberOfNeighboursInCell(riga	 , colonna +1) == numeroVicini) RelationalBoard.addNewPlayer(riga	, colonna +1, 	strategia, Direzione.values()[new Random().nextInt(Direzione.values().length)]);
+		if (RelationalBoard.isEmptyCell(riga +1	, colonna -1) && RelationalBoard.numberOfNeighboursInCell(riga +1, colonna -1) == numeroVicini) RelationalBoard.addNewPlayer(riga +1, colonna -1, 	strategia, Direzione.values()[new Random().nextInt(Direzione.values().length)]);
+		if (RelationalBoard.isEmptyCell(riga +1	, colonna	) && RelationalBoard.numberOfNeighboursInCell(riga +1, colonna	 ) == numeroVicini) RelationalBoard.addNewPlayer(riga +1, colonna	, 	strategia, Direzione.values()[new Random().nextInt(Direzione.values().length)]);
+		if (RelationalBoard.isEmptyCell(riga +1	, colonna +1) && RelationalBoard.numberOfNeighboursInCell(riga +1, colonna +1) == numeroVicini) RelationalBoard.addNewPlayer(riga +1, colonna +1, 	strategia, Direzione.values()[new Random().nextInt(Direzione.values().length)]);
 	}
 	
 	
 	protected void resetWealth() {
 		this.wealth = Parameters.BASE_WEALTH;
-		
 	}
-	
 	
 	/**
 	 *  Crea una copia del giocatore, inserendola nella relational board senza relazioni a caso o a una certa distanza dal genitore
+	 *  tale metodo ha due modalita' di replicazione implementate in fase di testing
 	 *  
 	 * @param spawnNear indica il tipo di replicazione nel gioco che dipende da @link {@link Giocatore#RANDOM_REPRODUCE}
-	 * @return true se il giocatore si e' replicato almeno una volta
+	 * @return true se il giocatore si e' replicato con successo almeno una volta
 	 */
 	protected boolean reproduce(boolean spawnNear) {
 		if(RelationalBoard.isFull()) return false;
@@ -190,7 +195,7 @@ public abstract class Giocatore {
 		// spawnNear = True: Replicazione standard nelle celle vicine
 		if(spawnNear) {
 			int viciniPrima = this.numeroDiRelazioni();
-			this.spawnNear(3, false); //replica il giocatori nelle celle intorno a lui che hanno 3 vicini
+			this.spawnNear(Parameters.NEIGHBOURS_TO_REPRODUCE, false); //replica il giocatori nelle celle intorno a lui che hanno 3 vicini
 			int viciniDopo = this.numeroDiRelazioni();
 			if (viciniDopo > viciniPrima) 
 				return true;	
@@ -245,7 +250,7 @@ public abstract class Giocatore {
 	//Metodi da implementare nelle sottoclassi che variano a seconda del tipo di giocatore:
 	public abstract float givePower(); 		// quanto benessere può potenzialmente dare alle sue relazioni
 	public abstract float takePower(); 		// quanto benessere può potenzialmente togliere alle sue relazioni
-	public abstract float talk(int k);		//invia un messaggio alla relazione k con i modificatori descritti nei MODIFIERS
+	public abstract float talk(int i);		//invia un messaggio alla relazione k con i modificatori descritti nei MODIFIERS
 	public abstract float colorHue();
 	
 	/**
@@ -331,11 +336,11 @@ public abstract class Giocatore {
 	 * @return oggetto Giocatore in posizione di relazione i
 	 */
 	public Giocatore relationship(int i) {
-		if (i == 0) return RelationalBoard.getPlayer(this.riga, this.colonna);
-		if (this.direction() == Direzione.up) return this.relationshipGiocatoreUp(i);
-		if (this.direction() == Direzione.down) return this.relationshipGiocatoreDown(i);
-		if (this.direction() == Direzione.left) return this.relationshipGiocatoreLeft(i);
-		if (this.direction() == Direzione.right) return this.relationshipGiocatoreRight(i);
+		if (i == 0) 								return RelationalBoard.getPlayer(this.riga, this.colonna);
+		if (this.direction() == Direzione.up) 		return this.relationshipGiocatoreUp(i);
+		if (this.direction() == Direzione.down) 	return this.relationshipGiocatoreDown(i);
+		if (this.direction() == Direzione.left) 	return this.relationshipGiocatoreLeft(i);
+		if (this.direction() == Direzione.right) 	return this.relationshipGiocatoreRight(i);
 		return null;
 				
 	}
@@ -426,8 +431,6 @@ public abstract class Giocatore {
 	 * dopo qualsiasi aggiornamento del benessere
 	 */
 	protected void updateColore() {
-		
-		
 		float brightness = (float) 0.5*(1+this.wealthPercent()); //la luminosita del colore aumenta con 
 		float hueGiocatore = 0;									//il benessere del giocatore
 		hueGiocatore = this.colorHue();
@@ -439,7 +442,10 @@ public abstract class Giocatore {
 	
 
 
-	
+	/**
+	 * Usato opzionalmente se si vuole usare per lo scambio di messaggi,
+	 * ad esempio se true potrebbe diminuire la quantita' di benessere dato di un giocatore
+	 */
 	public boolean hasRelationshipWithEgoista() {
 		for (int i = 1; i < Parameters.RELATIONSHIP_SIZE; i++) {
 			if (this.relationship(i) != null && this.relationship(i).strategy() == TipoGiocatore.egoista) {
@@ -449,7 +455,11 @@ public abstract class Giocatore {
 		return false;
 	}
 	
-	
+
+	/**
+	 * Usato opzionalmente se si vuole usare per lo scambio di messaggi,
+	 * ad esempio se true potrebbe aumentare la quantita' di benessere dato di un giocatore
+	 */
 		public boolean hasRelationshipWithGeneroso() {
 			for (int i = 1; i < Parameters.RELATIONSHIP_SIZE; i++) {
 				if (this.relationship(i) != null && this.relationship(i).strategy() == TipoGiocatore.generoso) {
