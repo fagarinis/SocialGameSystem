@@ -248,15 +248,6 @@ public class GraphicsSGS{
 		frmSocialGameSystem.getContentPane().add(panel, BorderLayout.EAST);
 		panel.setLayout(new GridLayout(0, 1, 0, 0));
 		
-		JLabel label_3 = new JLabel("");
-		panel.add(label_3);
-		
-		JLabel label = new JLabel("");
-		panel.add(label);
-		
-		JLabel label_1 = new JLabel("");
-		panel.add(label_1);
-		
 		JToolBar toolBar = new JToolBar();
 		toolBar.setToolTipText("");
 		toolBar.setName("");
